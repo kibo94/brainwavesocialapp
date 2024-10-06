@@ -1,0 +1,54 @@
+{
+  "project_info": {
+    "project_number": "1080333670709",
+    "project_id": "brainwave-social-media-c73b0",
+    "storage_bucket": "brainwave-social-media-c73b0.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1080333670709:android:8d8fd036b2d506418e147c",
+        "android_client_info": {
+          "package_name": "app.brainwave.brainwavesocialapp"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1080333670709-d1e2q1cd2gamo3qelb07o3ruqhb3ihee.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "app.brainwave.brainwavesocialapp",
+            "certificate_hash": "ff9d559b626fc1572c061697565843b56e5873f1"
+          }
+        },
+        {
+          "client_id": "1080333670709-6dsiqnjnlrm5m76b1u2mqrqj4tonmtnd.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBuvcH16s30kRSasBcJFiLgZnvDi9R-oMM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1080333670709-6dsiqnjnlrm5m76b1u2mqrqj4tonmtnd.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "1080333670709-gmn6vviiamuav7mrelrsb9van20c6io5.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "app.brainwave.brainwavesocialapp"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
