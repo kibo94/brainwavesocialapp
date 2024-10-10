@@ -23,3 +23,4 @@ export 'entity/post.dart';
 export 'entity/user.dart';
 export 'entity/image_type.dart';
 export 'entity/message.dart';
+export 'entity/chat_message.dart';

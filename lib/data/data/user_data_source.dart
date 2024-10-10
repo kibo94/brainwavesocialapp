@@ -1,4 +1,5 @@
 import 'package:brainwavesocialapp/constants/collections.dart';
+import 'package:brainwavesocialapp/data/models/message.dart';
 import 'package:firebase_cloud_firestore/firebase_cloud_firestore.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -112,6 +113,7 @@ class _UserRemoteDataSource implements UserRepository {
         .asBroadcastStream();
   }
 
+  @override
   @override
   Future<void> followUser(
     String currentUserId,
@@ -254,6 +256,58 @@ class _UserRemoteDataSource implements UserRepository {
       },
       SetOptions(merge: true),
     );
+  }
+
+  @override
+  Stream<List<MessageDataModel>> getMessages() {
+    return databaseDataSource
+        .collection(CollectionsName.messages.name)
+        .orderBy('timestamp', descending: false)
+        .limit(50)
+        .withConverter<MessageDataModel>(
+          fromFirestore: MessageDataModel.fromFirestore,
+          toFirestore: (post, _) => post.toJson(),
+        )
+        .snapshots()
+        .map(
+          (snapshot) => snapshot.docs
+              .map(
+                (e) => e.data(),
+              )
+              .toList(),
+        );
+  }
+
+  @override
+  Future<void> sendMessage(
+      String userId, String message, String userEmail) async {
+    try {
+      final newMessage = MessageDataModel(
+          uid: '',
+          content: message,
+          ownerId: userId,
+          timestamp: DateTime.now(),
+          userEmail: userEmail);
+
+      final document = await databaseDataSource
+          .collection(
+            CollectionsName.messages.name,
+          )
+          .withConverter<MessageDataModel>(
+            fromFirestore: (snapshot, _) => MessageDataModel.fromJson(
+              {
+                ...snapshot.data()!,
+                'uid': snapshot.id,
+              },
+            ),
+            toFirestore: (post, _) => post.toJson(),
+          )
+          .add(newMessage);
+
+      return document.get().then((snapshot) => snapshot.data()!);
+    } catch (e) {
+      throw Exception('Failed to create post: $e');
+    }
   }
 }
 

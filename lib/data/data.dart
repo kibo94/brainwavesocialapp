@@ -10,6 +10,7 @@ export 'models/current_user.dart';
 export 'models/comment.dart';
 export 'models/post.dart';
 export 'models/userinfo.dart';
+export 'models/message.dart';
 
 // repository
 export 'repository/auth_repository.dart';

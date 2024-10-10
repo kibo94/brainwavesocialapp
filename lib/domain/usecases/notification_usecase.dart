@@ -36,7 +36,7 @@ class _NotificationUseCase implements NotificationUseCase {
   Stream<Message> onMessageWhenBackground() {
     return _notificationRepository.onMessageOpenedApp.map(
       (event) {
-        print('event: $event background ');
+        // print('event: $event background ');
         return Message.fromDataModel(event);
       },
     );
@@ -46,7 +46,7 @@ class _NotificationUseCase implements NotificationUseCase {
   Stream<Message> onReceiveMessageWhenOpened() {
     return _notificationRepository.onMessage.map(
       (event) {
-        print('event: $event  ');
+        // print('event: $event  ');
         return Message.fromDataModel(event);
       },
     );

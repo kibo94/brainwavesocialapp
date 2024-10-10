@@ -1,3 +1,4 @@
+import 'package:brainwavesocialapp/data/models/message.dart';
 import '../models/post.dart';
 import '../models/userinfo.dart';
 
@@ -9,6 +10,7 @@ abstract interface class UserRepository {
   Future<void> followUser(String currentUserId, String idUserToFollow);
   Future<void> unFollowUser(String currentUserId, String idUserToUnfollow);
   Stream<bool> userLikedAPost(String postId, String userId);
+
   Future<List<UserInfoDataModel>> searchUsers();
   Future<void> editUserProfile({
     required String uid,
@@ -27,4 +29,6 @@ abstract interface class UserRepository {
     required String uid,
     String? coverImageUrl,
   });
+  Future<void> sendMessage(String userId, String message, String userEmail);
+  Stream<List<MessageDataModel>> getMessages();
 }

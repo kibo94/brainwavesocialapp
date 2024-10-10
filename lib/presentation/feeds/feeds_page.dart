@@ -55,30 +55,43 @@ class FeedsPage extends ConsumerWidget {
             },
           ),
           actions: [
-            IconButton(
-              icon: const Icon(Icons.add_circle_outline),
-              onPressed: () {
-                Modals.showPostModal(
-                  context,
-                  controller,
-                  () {
-                    ref.read(
-                      createPostStateProvider(
-                        controller.text,
-                      ),
-                    );
+            Row(
+              children: [
+                IconButton(
+                  onPressed: () => {
                     AppRouter.go(
                       context,
-                      RouterNames.userProfilePage,
-                      pathParameters: {
-                        'userId': currentUser.value!.uid,
+                      RouterNames.messagePage,
+                    )
+                  },
+                  icon: const Icon(Icons.message_outlined),
+                ),
+                IconButton(
+                  icon: const Icon(Icons.add_circle_outline),
+                  onPressed: () {
+                    Modals.showPostModal(
+                      context,
+                      controller,
+                      () {
+                        ref.read(
+                          createPostStateProvider(
+                            controller.text,
+                          ),
+                        );
+                        AppRouter.go(
+                          context,
+                          RouterNames.userProfilePage,
+                          pathParameters: {
+                            'userId': currentUser.value!.uid,
+                          },
+                        );
+                        controller.clear();
+                        AppRouter.pop(context);
                       },
                     );
-                    controller.clear();
-                    AppRouter.pop(context);
                   },
-                );
-              },
+                ),
+              ],
             ),
           ],
           bottomNavigationBar: BottomNavigationBar(

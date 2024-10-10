@@ -1,3 +1,4 @@
+import 'package:brainwavesocialapp/presentation/message/message_page.dart';
 import 'package:brainwavesocialapp/presentation/presentation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -79,6 +80,11 @@ final routerConfig = Provider<GoRouter>(
             path: 'notifications',
             name: RouterNames.notificationsPage.name,
             builder: (context, state) => const NotificationsPage(),
+          ),
+          GoRoute(
+            path: 'messages',
+            name: RouterNames.messagePage.name,
+            builder: (context, state) => MessasgePage(),
           ),
         ],
       ),

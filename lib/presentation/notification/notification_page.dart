@@ -12,7 +12,6 @@ class NotificationPage extends ConsumerWidget {
 
     return CommonPageScaffold(
       title: 'Notification',
-      child: Text('NotificationPage'),
       bottomNavigationBar: BottomNavigationBar(
         onTap: (int index) {
           if (index == 0) {
@@ -44,6 +43,7 @@ class NotificationPage extends ConsumerWidget {
           ),
         ],
       ),
+      child: const Text('NotificationPage'),
     );
   }
 }

@@ -1,7 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-
 import '../../domain/domain.dart';
-import '../../domain/usecases/post_like_usecase.dart';
 
 final getUserInfoStateProvider =
     StreamProvider.autoDispose.family<AppUser?, String>(

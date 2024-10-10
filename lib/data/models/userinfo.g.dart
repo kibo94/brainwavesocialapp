@@ -9,13 +9,13 @@ part of 'userinfo.dart';
 UserInfoDataModel _$UserInfoDataModelFromJson(Map<String, dynamic> json) =>
     UserInfoDataModel(
       uid: json['uid'] as String,
-      email: json['email'] as String,
-      displayName: json['displayName'] as String?,
-      firstName: json['firstName'] as String?,
-      lastName: json['lastName'] as String?,
-      photoUrl: json['photoUrl'] as String?,
-      coverImageUrl: json['coverImageUrl'] as String?,
-      bio: json['bio'] as String?,
+      email: json['email'] as String?,
+      displayName: json['displayName'] as String? ?? "",
+      firstName: json['firstName'] as String? ?? "",
+      lastName: json['lastName'] as String? ?? "",
+      photoUrl: json['photoUrl'] as String? ?? "",
+      coverImageUrl: json['coverImageUrl'] as String? ?? "",
+      bio: json['bio'] as String? ?? "",
       deviceTokens: (json['deviceTokens'] as List<dynamic>?)
           ?.map((e) => e as String)
           .toList(),

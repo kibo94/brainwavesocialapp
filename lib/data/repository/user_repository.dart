@@ -1,3 +1,4 @@
+import 'package:brainwavesocialapp/data/models/message.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../data/user_data_source.dart';
@@ -35,6 +36,16 @@ class _UserRepository implements UserRepository {
   @override
   Stream<List<String>?> getFollowings(String uid) {
     return databaseDataSource.getFollowings(uid);
+  }
+
+  @override
+  Future<void> sendMessage(String userId, String message, String userEmail) {
+    return databaseDataSource.sendMessage(userId, message, userEmail);
+  }
+
+  @override
+  Stream<List<MessageDataModel>> getMessages() {
+    return databaseDataSource.getMessages();
   }
 
   @override
