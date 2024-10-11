@@ -1,6 +1,5 @@
 import 'package:brainwavesocialapp/data/models/message.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-
 import '../data/user_data_source.dart';
 import '../interfaces/user_interface.dart';
 import '../models/post.dart';
@@ -46,6 +45,12 @@ class _UserRepository implements UserRepository {
   @override
   Stream<List<MessageDataModel>> getMessages() {
     return databaseDataSource.getMessages();
+  }
+
+  @override
+  Stream<List<MessageDataModel>> getSingleChatMessages(
+      String fromEmail, String toEmail) {
+    return databaseDataSource.getSingleChatMessages(fromEmail, toEmail);
   }
 
   @override

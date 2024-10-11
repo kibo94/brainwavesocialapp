@@ -13,6 +13,9 @@ MessageDataModel _$MessageDataModelFromJson(Map<String, dynamic> json) =>
       content: json['content'] as String,
       timestamp: TimestampConverter.fromJson(json['timestamp'] as Timestamp?),
       userEmail: json['userEmail'] as String,
+      participants: (json['participants'] as List<dynamic>)
+          .map((e) => e as String)
+          .toList(),
     );
 
 Map<String, dynamic> _$MessageDataModelToJson(MessageDataModel instance) =>
@@ -20,5 +23,6 @@ Map<String, dynamic> _$MessageDataModelToJson(MessageDataModel instance) =>
       'ownerId': instance.ownerId,
       'content': instance.content,
       'userEmail': instance.userEmail,
+      'participants': instance.participants,
       'timestamp': TimestampConverter.toJson(instance.timestamp),
     };

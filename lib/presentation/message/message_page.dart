@@ -5,30 +5,28 @@ import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class MessasgePage extends ConsumerWidget {
+class MessagePage extends ConsumerWidget {
   final TextEditingController _controller = TextEditingController();
   final ScrollController _scrollController = ScrollController();
+  final String user2Id;
 
-  MessasgePage({super.key});
+  MessagePage({
+    super.key,
+    required this.user2Id,
+  });
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    // Access the MessageProvider using ref.watch
-    final messages = ref.watch(messagesProvider);
-
+    final messages = ref.watch(singleMessageProvider(user2Id));
     void scrollToBottom() {
       if (_scrollController.hasClients) {
-        _scrollController.animateTo(
-          _scrollController.position.maxScrollExtent + 300, // Scroll to bottom
-          duration: const Duration(milliseconds: 0),
-          curve: Curves.linear,
-        );
+        _scrollController
+            .jumpTo(_scrollController.position.maxScrollExtent + 300);
       }
     }
 
-    // Wait for layout to finish using SchedulerBinding
     SchedulerBinding.instance.addPostFrameCallback((_) {
       if (_scrollController.hasClients) {
-        if (messages.value!.length > 6) {
+        if (messages.value != null && messages.value!.length > 6) {
           _scrollController
               .jumpTo(_scrollController.position.maxScrollExtent + 300);
         }
@@ -46,7 +44,7 @@ class MessasgePage extends ConsumerWidget {
           Expanded(
             child: ListView.builder(
               controller: _scrollController, // Attach the controller
-              itemCount: messages.value?.length ?? 0,
+              itemCount: messages.value != null ? messages.value?.length : 0,
               itemBuilder: (context, index) {
                 final ChatMessage chatMessage = messages.value![index];
                 return Padding(
@@ -104,7 +102,7 @@ class MessasgePage extends ConsumerWidget {
                   onPressed: () {
                     String message = _controller.text.trim();
                     if (message.isNotEmpty) {
-                      ref.read(sendMessageStateProvider(message));
+                      ref.read(sendMessageStateProvider([message, user2Id]));
                       scrollToBottom();
                       // Close the keyboard
                       FocusScope.of(context).unfocus(); // Dismiss the keyboard

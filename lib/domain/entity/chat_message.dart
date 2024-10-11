@@ -8,6 +8,7 @@ class ChatMessage extends MessageDataModel {
       required super.ownerId,
       required super.content,
       required super.timestamp,
+      required super.participants,
       required super.userEmail});
 
   toDataModel() {
@@ -16,11 +17,13 @@ class ChatMessage extends MessageDataModel {
         ownerId: super.ownerId,
         content: super.content,
         timestamp: super.timestamp,
+        participants: super.participants,
         userEmail: super.userEmail);
   }
 
   factory ChatMessage.fromDataModel(MessageDataModel dataModel) {
     return ChatMessage(
+        participants: dataModel.participants,
         uid: dataModel.uid,
         ownerId: dataModel.ownerId,
         content: dataModel.content,

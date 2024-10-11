@@ -71,6 +71,14 @@ class UserProfilePage extends ConsumerWidget {
                   children: [
                     Text('$following Following'),
                     Text('$followers Followers'),
+                    if (user.id != currentUser.uid)
+                      IconButton(
+                        onPressed: () => {
+                          AppRouter.go(context, RouterNames.messagePage,
+                              pathParameters: {'user2Id': user.email!})
+                        },
+                        icon: const Icon(Icons.message_outlined),
+                      ),
                   ],
                 ),
                 const Divider(),

@@ -57,15 +57,15 @@ class FeedsPage extends ConsumerWidget {
           actions: [
             Row(
               children: [
-                IconButton(
-                  onPressed: () => {
-                    AppRouter.go(
-                      context,
-                      RouterNames.messagePage,
-                    )
-                  },
-                  icon: const Icon(Icons.message_outlined),
-                ),
+                // IconButton(
+                //   onPressed: () => {
+                //     AppRouter.go(
+                //       context,
+                //       RouterNames.messagePage,
+                //     )
+                //   },
+                //   icon: const Icon(Icons.message_outlined),
+                // ),
                 IconButton(
                   icon: const Icon(Icons.add_circle_outline),
                   onPressed: () {

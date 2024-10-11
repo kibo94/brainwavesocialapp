@@ -31,4 +31,6 @@ abstract interface class UserRepository {
   });
   Future<void> sendMessage(String userId, String message, String userEmail);
   Stream<List<MessageDataModel>> getMessages();
+  Stream<List<MessageDataModel>> getSingleChatMessages(
+      String user1Id, String userId2);
 }

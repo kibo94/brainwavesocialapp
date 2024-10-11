@@ -82,9 +82,11 @@ final routerConfig = Provider<GoRouter>(
             builder: (context, state) => const NotificationsPage(),
           ),
           GoRoute(
-            path: 'messages',
+            path: 'messages/:user2Id',
             name: RouterNames.messagePage.name,
-            builder: (context, state) => MessasgePage(),
+            builder: (context, state) => MessagePage(
+              user2Id: state.pathParameters['user2Id']!,
+            ),
           ),
         ],
       ),

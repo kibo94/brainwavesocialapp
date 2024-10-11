@@ -53,11 +53,8 @@ class _UserRemoteDataSource implements UserRepository {
     return databaseDataSource
         .collection(CollectionsName.posts.name)
         .where('ownerId', isEqualTo: uid)
-        // need to explain compound queries in firestore
         .orderBy('timestamp', descending: true)
-        // explain pagination
         .limit(10)
-        // explain startAt and EndAt in firestore
         .withConverter(
           fromFirestore: (snapshot, _) {
             return PostDataModel.fromJson({
@@ -279,15 +276,47 @@ class _UserRemoteDataSource implements UserRepository {
   }
 
   @override
+  Stream<List<MessageDataModel>> getSingleChatMessages(
+      String fromEmail, String toUserEmail) {
+    return databaseDataSource
+        .collection(CollectionsName.messages.name)
+        .where(
+          'participants',
+          arrayContains: fromEmail, // First, filter for userId1
+        )
+        .orderBy('timestamp', descending: false)
+        .limit(100)
+        .withConverter<MessageDataModel>(
+          fromFirestore: (snapshot, _) => MessageDataModel.fromJson(
+            {
+              ...snapshot.data()!,
+              'uid': snapshot.id,
+            },
+          ),
+          toFirestore: (message, _) => message.toJson(),
+        )
+        .snapshots()
+        .map((snapshot) {
+      // Step to filter results to ensure both userId1 and userId2 are in participants
+      return snapshot.docs.map((e) => e.data()).where((message) {
+        final participants = message.participants;
+        return participants
+            .contains(toUserEmail); // Ensure userId2 is also in participants
+      }).toList();
+    });
+  }
+
+  @override
   Future<void> sendMessage(
-      String userId, String message, String userEmail) async {
+      String fromUserEmail, String message, String toUserEmail) async {
     try {
       final newMessage = MessageDataModel(
           uid: '',
           content: message,
-          ownerId: userId,
+          participants: [fromUserEmail, toUserEmail],
+          ownerId: fromUserEmail,
           timestamp: DateTime.now(),
-          userEmail: userEmail);
+          userEmail: fromUserEmail);
 
       final document = await databaseDataSource
           .collection(
