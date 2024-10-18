@@ -1,4 +1,5 @@
 import 'package:brainwavesocialapp/presentation/chats/chats_page.dart';
+import 'package:brainwavesocialapp/presentation/createRoute/create_route_page.dart';
 import 'package:brainwavesocialapp/presentation/message/message_page.dart';
 import 'package:brainwavesocialapp/presentation/presentation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -86,6 +87,11 @@ final routerConfig = Provider<GoRouter>(
             path: 'chats',
             name: RouterNames.chats.name,
             builder: (context, state) => ChatsPage(),
+          ),
+          GoRoute(
+            path: 'createGroup',
+            name: RouterNames.createGroup.name,
+            builder: (context, state) => CreateGroupPage(),
           ),
           GoRoute(
             path: 'messages/:toUserId',

@@ -20,17 +20,17 @@ class ChatsPage extends ConsumerWidget {
     return CommonPageScaffold(
       centerTitle: false,
       withPadding: true,
-      // actions: [
-      //   Padding(
-      //     padding: const EdgeInsets.only(right: 16),
-      //     child: GestureDetector(
-      //       child: Text(
-      //         "Create Group",
-      //         style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-      //       ),
-      //     ),
-      //   )
-      // ],
+      actions: [
+        Padding(
+          padding: const EdgeInsets.only(right: 16),
+          child: GestureDetector(
+            child: Text(
+              "Create Group",
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            ),
+          ),
+        )
+      ],
       title: "Chats",
       child: Column(
         children: [
