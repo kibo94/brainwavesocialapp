@@ -8,15 +8,12 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 class MessagePage extends ConsumerWidget {
   final TextEditingController _controller = TextEditingController();
   final ScrollController _scrollController = ScrollController();
-  final String user2Id;
+  final String toUserId;
 
-  MessagePage({
-    super.key,
-    required this.user2Id,
-  });
+  MessagePage({super.key, required this.toUserId});
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final messages = ref.watch(singleMessageProvider(user2Id));
+    final messages = ref.watch(singleMessageProvider(toUserId));
     void scrollToBottom() {
       if (_scrollController.hasClients) {
         _scrollController
@@ -35,7 +32,7 @@ class MessagePage extends ConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Messages"),
+        title: Text(toUserId),
       ),
       body: Column(
         children: [
@@ -57,7 +54,7 @@ class MessagePage extends ConsumerWidget {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(chatMessage.userEmail),
+                          Text(chatMessage.senderId),
                           GapWidgets.h8,
                           Container(
                             width: 200,
@@ -102,7 +99,7 @@ class MessagePage extends ConsumerWidget {
                   onPressed: () {
                     String message = _controller.text.trim();
                     if (message.isNotEmpty) {
-                      ref.read(sendMessageStateProvider([message, user2Id]));
+                      ref.read(sendMessageStateProvider([message, toUserId]));
                       scrollToBottom();
                       // Close the keyboard
                       FocusScope.of(context).unfocus(); // Dismiss the keyboard

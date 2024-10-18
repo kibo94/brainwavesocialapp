@@ -5,5 +5,6 @@ enum CollectionsName {
   likes,
   followers,
   following,
-  messages
+  messages,
+  chats
 }

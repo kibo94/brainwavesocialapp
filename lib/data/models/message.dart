@@ -8,19 +8,19 @@ part 'message.g.dart';
 class MessageDataModel {
   MessageDataModel({
     required this.uid,
-    required this.ownerId,
+    required this.senderId,
     required this.content,
     required this.timestamp,
-    required this.userEmail,
-    required this.participants,
+    required this.messageType,
+    required this.readBy,
   });
 
   @JsonKey(includeToJson: false)
   final String uid;
-  final String ownerId;
+  final String senderId;
   final String content;
-  final String userEmail;
-  final List<String> participants;
+  final String messageType;
+  final List<String> readBy;
 
   @JsonKey(
     fromJson: TimestampConverter.fromJson,

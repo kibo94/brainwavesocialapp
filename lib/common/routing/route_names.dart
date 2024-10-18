@@ -11,5 +11,6 @@ enum RouterNames {
   postDetailPage,
   editProfilePage,
   authPage,
-  messagePage
+  messagePage,
+  chats
 }

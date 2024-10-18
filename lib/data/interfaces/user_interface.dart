@@ -1,3 +1,4 @@
+import 'package:brainwavesocialapp/data/models/chat.dart';
 import 'package:brainwavesocialapp/data/models/message.dart';
 import '../models/post.dart';
 import '../models/userinfo.dart';
@@ -32,5 +33,7 @@ abstract interface class UserRepository {
   Future<void> sendMessage(String userId, String message, String userEmail);
   Stream<List<MessageDataModel>> getMessages();
   Stream<List<MessageDataModel>> getSingleChatMessages(
-      String user1Id, String userId2);
+      String fromUserId, String toUserId);
+  Stream<List<ChatDataModel>> getAllChatsForUser(String userEmail);
+  Stream<int> getUnreadChatsCount(String currentUser);
 }

@@ -5,7 +5,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 abstract interface class UserMessageUseCase {
   Future<void> sentMessage(String message, String user2Email);
   Stream<List<ChatMessage>> getMessages();
-  Stream<List<ChatMessage>> getSingleChatMessages(String toEmail);
+  Stream<int> getUnreadChatsCount();
+  Stream<List<ChatMessage>> getSingleChatMessages(String toUserId);
 }
 
 class _UserMessageUseCase implements UserMessageUseCase {
@@ -17,6 +18,12 @@ class _UserMessageUseCase implements UserMessageUseCase {
   Future<void> sentMessage(String message, String user2Email) {
     final user = _authRepository.currentUser;
     return _userRepository.sendMessage(user.email!, message, user2Email);
+  }
+
+  @override
+  Stream<int> getUnreadChatsCount() {
+    final user = _authRepository.currentUser;
+    return _userRepository.getUnreadChatsCount(user.email!);
   }
 
   @override
@@ -33,10 +40,10 @@ class _UserMessageUseCase implements UserMessageUseCase {
   }
 
   @override
-  Stream<List<ChatMessage>> getSingleChatMessages(String toEmail) async* {
+  Stream<List<ChatMessage>> getSingleChatMessages(String toUserId) async* {
     final user = _authRepository.currentUser;
     final messages =
-        _userRepository.getSingleChatMessages(user.email!, toEmail).map(
+        _userRepository.getSingleChatMessages(user.email!, toUserId).map(
               (event) => event
                   .map(
                     (message) => ChatMessage.fromDataModel(message),

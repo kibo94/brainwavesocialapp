@@ -3,31 +3,34 @@ import 'package:flutter/foundation.dart';
 
 @immutable
 class ChatMessage extends MessageDataModel {
-  ChatMessage(
-      {required super.uid,
-      required super.ownerId,
-      required super.content,
-      required super.timestamp,
-      required super.participants,
-      required super.userEmail});
+  ChatMessage({
+    required super.uid,
+    required super.senderId,
+    required super.content,
+    required super.timestamp,
+    required super.messageType,
+    required super.readBy,
+  });
 
   toDataModel() {
     return MessageDataModel(
-        uid: super.uid,
-        ownerId: super.ownerId,
-        content: super.content,
-        timestamp: super.timestamp,
-        participants: super.participants,
-        userEmail: super.userEmail);
+      uid: super.uid,
+      senderId: super.senderId,
+      content: super.content,
+      messageType: super.messageType,
+      timestamp: super.timestamp,
+      readBy: super.readBy,
+    );
   }
 
   factory ChatMessage.fromDataModel(MessageDataModel dataModel) {
     return ChatMessage(
-        participants: dataModel.participants,
-        uid: dataModel.uid,
-        ownerId: dataModel.ownerId,
-        content: dataModel.content,
-        timestamp: dataModel.timestamp,
-        userEmail: dataModel.userEmail);
+      readBy: dataModel.readBy,
+      uid: dataModel.uid,
+      senderId: dataModel.senderId,
+      messageType: dataModel.messageType,
+      content: dataModel.content,
+      timestamp: dataModel.timestamp,
+    );
   }
 }

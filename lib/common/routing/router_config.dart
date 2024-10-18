@@ -1,3 +1,4 @@
+import 'package:brainwavesocialapp/presentation/chats/chats_page.dart';
 import 'package:brainwavesocialapp/presentation/message/message_page.dart';
 import 'package:brainwavesocialapp/presentation/presentation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -82,11 +83,19 @@ final routerConfig = Provider<GoRouter>(
             builder: (context, state) => const NotificationsPage(),
           ),
           GoRoute(
-            path: 'messages/:user2Id',
+            path: 'chats',
+            name: RouterNames.chats.name,
+            builder: (context, state) => ChatsPage(),
+          ),
+          GoRoute(
+            path: 'messages/:toUserId',
             name: RouterNames.messagePage.name,
-            builder: (context, state) => MessagePage(
-              user2Id: state.pathParameters['user2Id']!,
-            ),
+            builder: (context, state) {
+              final toUserId = state.pathParameters['toUserId']!;
+              return MessagePage(
+                toUserId: toUserId,
+              );
+            },
           ),
         ],
       ),

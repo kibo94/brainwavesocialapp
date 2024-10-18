@@ -1,4 +1,5 @@
 import 'package:brainwavesocialapp/constants/collections.dart';
+import 'package:brainwavesocialapp/data/models/chat.dart';
 import 'package:brainwavesocialapp/data/models/message.dart';
 import 'package:firebase_cloud_firestore/firebase_cloud_firestore.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -275,67 +276,220 @@ class _UserRemoteDataSource implements UserRepository {
         );
   }
 
+  Future<String?> getChatId(String fromUserEmail, String toUserEmail) async {
+    final chatCollection =
+        databaseDataSource.collection(CollectionsName.chats.name);
+    final querySnapshot = await chatCollection
+        .where('participants', arrayContains: fromUserEmail)
+        .get();
+
+    String? chatId;
+
+    // // Step 2: Check if the chat exists by looking for 'toUserEmail' in the participants
+    for (var doc in querySnapshot.docs) {
+      List<dynamic> participants = doc['participants'];
+      if (participants.contains(toUserEmail)) {
+        chatId = doc.id;
+        break;
+      }
+    }
+    return chatId;
+  }
+
   @override
   Stream<List<MessageDataModel>> getSingleChatMessages(
-      String fromEmail, String toUserEmail) {
+      String fromUserId, String toUserId) async* {
+    final chatCollection = databaseDataSource.collection('chats');
+
+    // Continuously listen for chats involving the fromUserId
+    await for (var querySnapshot in chatCollection
+        .where('participants', arrayContains: fromUserId)
+        .snapshots()) {
+      String? chatId;
+
+      // Find the chat ID between the two users
+      for (var doc in querySnapshot.docs) {
+        List<String> participants =
+            List<String>.from(doc.data()['participants']);
+        if (participants.contains(toUserId)) {
+          chatId = doc.id;
+          break;
+        }
+      }
+
+      if (chatId != null) {
+        // Listen for messages in real-time and reset unread counts for both users
+        final chatDocRef = chatCollection.doc(chatId);
+
+        // Listen for real-time updates in the 'messages' subcollection
+        yield* chatDocRef
+            .collection('messages')
+            .orderBy('timestamp',
+                descending: false) // Order messages by timestamp
+            .snapshots()
+            .asyncMap((snapshot) async {
+          // Fetch the chat document to check and reset the unread count
+          final chatSnapshot = await chatDocRef.get();
+          if (chatSnapshot.exists) {
+            final chatData = chatSnapshot.data() as Map<String, dynamic>;
+
+            // Check if unread counts need to be reset
+            final unreadCount = chatData['unreadCount'] as Map<String, dynamic>;
+
+            // If either user has unread messages, reset their counts to 0
+
+            await chatDocRef.update({
+              'unreadCount': {
+                fromUserId: 0, // Reset unread count for fromUserId
+                toUserId: unreadCount[toUserId]
+              },
+            });
+          }
+
+          // Return the list of messages
+          return snapshot.docs.map((doc) {
+            return MessageDataModel.fromJson({
+              ...doc.data(),
+              'uid': doc.id, // Add message ID to the model
+            });
+          }).toList();
+        });
+      } else {
+        // If no chat found, yield an empty list
+        yield [];
+      }
+    }
+  }
+
+  @override
+  Stream<int> getUnreadChatsCount(String currentUserId) async* {
+    final chatCollection = databaseDataSource.collection('chats');
+
+    // Listen for real-time changes in the chats collection where currentUserId is a participant
+    await for (var querySnapshot in chatCollection
+        .where('participants', arrayContains: currentUserId)
+        .snapshots()) {
+      int unreadChatsCount = 0;
+
+      // Loop through each chat document in the snapshot
+      for (var doc in querySnapshot.docs) {
+        final data = doc.data();
+
+        // Check if the 'unreadCount' field exists and if currentUserId has unread messages
+        if (data.containsKey('unreadCount') &&
+            data['unreadCount'][currentUserId] != null) {
+          final unreadCountForUser = data['unreadCount'][currentUserId];
+
+          // Increment count if the unread count for the user is greater than 0
+          if (unreadCountForUser > 0) {
+            unreadChatsCount++;
+          }
+        }
+      }
+
+      // Emit the updated unread chats count
+      yield unreadChatsCount;
+    }
+  }
+
+  @override
+  Stream<List<ChatDataModel>> getAllChatsForUser(String userEmail) {
     return databaseDataSource
-        .collection(CollectionsName.messages.name)
+        .collection(CollectionsName.chats.name)
         .where(
           'participants',
-          arrayContains: fromEmail, // First, filter for userId1
+          arrayContains:
+              userEmail, // Fetch all chats where the user is a participant
         )
-        .orderBy('timestamp', descending: false)
+        .orderBy('lastMessageTimestamp',
+            descending: true) // Order by last message timestamp, descending
         .limit(100)
-        .withConverter<MessageDataModel>(
-          fromFirestore: (snapshot, _) => MessageDataModel.fromJson(
+        .withConverter<ChatDataModel>(
+          fromFirestore: (snapshot, _) => ChatDataModel.fromJson(
             {
               ...snapshot.data()!,
-              'uid': snapshot.id,
+              'chatId': snapshot.id, // Add chatId to the model
             },
           ),
-          toFirestore: (message, _) => message.toJson(),
+          toFirestore: (chat, _) => chat.toJson(),
         )
         .snapshots()
-        .map((snapshot) {
-      // Step to filter results to ensure both userId1 and userId2 are in participants
-      return snapshot.docs.map((e) => e.data()).where((message) {
-        final participants = message.participants;
-        return participants
-            .contains(toUserEmail); // Ensure userId2 is also in participants
-      }).toList();
-    });
+        .map(
+          (snapshot) => snapshot.docs.map((e) => e.data()).toList(),
+        );
   }
 
   @override
   Future<void> sendMessage(
       String fromUserEmail, String message, String toUserEmail) async {
     try {
-      final newMessage = MessageDataModel(
-          uid: '',
-          content: message,
-          participants: [fromUserEmail, toUserEmail],
-          ownerId: fromUserEmail,
-          timestamp: DateTime.now(),
-          userEmail: fromUserEmail);
+      var chatCollection =
+          databaseDataSource.collection(CollectionsName.chats.name);
+      String? chatId = await getChatId(fromUserEmail, toUserEmail);
 
-      final document = await databaseDataSource
-          .collection(
-            CollectionsName.messages.name,
-          )
+      // // Step 3: If chat does not exist, create a new one
+      if (chatId == null) {
+        final newChat = {
+          'type': "private",
+          'participants': [fromUserEmail, toUserEmail],
+          'lastMessage': message,
+          'lastMessageTimestamp': FieldValue.serverTimestamp(),
+          'unreadCount': {
+            fromUserEmail: 0, // Sender has no unread messages
+            toUserEmail: 1 // Recipient has one unread message
+          },
+        };
+        final chatDoc = await chatCollection.add(newChat);
+        chatId = chatDoc.id;
+      } else {
+        // Step 4: If the chat exists, increment unread count for recipient
+        final chatDoc = chatCollection.doc(chatId);
+        // Get the current chat document data
+        final chatSnapshot = await chatDoc.get();
+        if (chatSnapshot.exists) {
+          final chatData = chatSnapshot.data() as Map<String, dynamic>;
+          final unreadCount = chatData['unreadCount'] as Map<String, dynamic>;
+
+          // Increment the unread count for the recipient
+          final newUnreadCount = unreadCount[toUserEmail] != null
+              ? unreadCount[toUserEmail] + 1
+              : 1;
+
+          await chatDoc.update({
+            'lastMessage': message,
+            'lastMessageTimestamp': FieldValue.serverTimestamp(),
+            'unreadCount': {
+              fromUserEmail: 0,
+              toUserEmail: newUnreadCount,
+            }
+          });
+        }
+      }
+
+      // Step 5: Create the new message data
+      final newMessage = MessageDataModel(
+        uid: '',
+        content: message,
+        messageType: "text",
+        readBy: [fromUserEmail],
+        senderId: fromUserEmail,
+        timestamp: DateTime.now(),
+      );
+
+      // Step 6: Add the message to the 'messages' subcollection in the chat
+      final messageCollection =
+          chatCollection.doc(chatId).collection('messages');
+      await messageCollection
           .withConverter<MessageDataModel>(
-            fromFirestore: (snapshot, _) => MessageDataModel.fromJson(
-              {
-                ...snapshot.data()!,
-                'uid': snapshot.id,
-              },
-            ),
+            fromFirestore: (snapshot, _) => MessageDataModel.fromJson({
+              ...snapshot.data()!,
+              'uid': snapshot.id,
+            }),
             toFirestore: (post, _) => post.toJson(),
           )
           .add(newMessage);
-
-      return document.get().then((snapshot) => snapshot.data()!);
     } catch (e) {
-      throw Exception('Failed to create post: $e');
+      throw const FireBaseException();
     }
   }
 }

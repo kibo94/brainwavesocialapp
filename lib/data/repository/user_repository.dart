@@ -1,3 +1,4 @@
+import 'package:brainwavesocialapp/data/models/chat.dart';
 import 'package:brainwavesocialapp/data/models/message.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../data/user_data_source.dart';
@@ -49,8 +50,18 @@ class _UserRepository implements UserRepository {
 
   @override
   Stream<List<MessageDataModel>> getSingleChatMessages(
-      String fromEmail, String toEmail) {
-    return databaseDataSource.getSingleChatMessages(fromEmail, toEmail);
+      String fromUserId, String toUserId) {
+    return databaseDataSource.getSingleChatMessages(fromUserId, toUserId);
+  }
+
+  @override
+  Stream<List<ChatDataModel>> getAllChatsForUser(String userEmail) {
+    return databaseDataSource.getAllChatsForUser(userEmail);
+  }
+
+  @override
+  Stream<int> getUnreadChatsCount(String currentUserId) {
+    return databaseDataSource.getUnreadChatsCount(currentUserId);
   }
 
   @override

@@ -15,6 +15,7 @@ class FeedsPage extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final currentUser = ref.watch(currentUserStateProvider);
+    final unreadCount = ref.watch(unreadChatsProvider);
     final posts = ref.watch(feedStateProvider);
 
     if (currentUser.isLoading || posts.isLoading) {
@@ -57,15 +58,36 @@ class FeedsPage extends ConsumerWidget {
           actions: [
             Row(
               children: [
-                // IconButton(
-                //   onPressed: () => {
-                //     AppRouter.go(
-                //       context,
-                //       RouterNames.messagePage,
-                //     )
-                //   },
-                //   icon: const Icon(Icons.message_outlined),
-                // ),
+                GestureDetector(
+                  onTap: () => {
+                    AppRouter.go(
+                      context,
+                      RouterNames.chats,
+                    )
+                  },
+                  child: Stack(
+                    children: [
+                      const Padding(
+                        padding: EdgeInsets.all(8.0),
+                        child: Icon(Icons.message_outlined),
+                      ),
+                      if (unreadCount.value! > 0)
+                        Container(
+                            width: 22,
+                            height: 22,
+                            alignment: Alignment.center,
+                            decoration: BoxDecoration(
+                                color: Colors.redAccent,
+                                borderRadius: BorderRadius.circular(20)),
+                            child: Text(
+                              unreadCount.value.toString(),
+                              style: const TextStyle(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.bold),
+                            )),
+                    ],
+                  ),
+                ),
                 IconButton(
                   icon: const Icon(Icons.add_circle_outline),
                   onPressed: () {

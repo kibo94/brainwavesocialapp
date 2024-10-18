@@ -11,6 +11,7 @@ export 'models/comment.dart';
 export 'models/post.dart';
 export 'models/userinfo.dart';
 export 'models/message.dart';
+export 'models/chat.dart';
 
 // repository
 export 'repository/auth_repository.dart';
