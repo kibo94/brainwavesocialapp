@@ -1,4 +1,5 @@
 import 'package:brainwavesocialapp/data/models/chat.dart';
+import 'package:brainwavesocialapp/data/models/chat_group.dart';
 import 'package:brainwavesocialapp/data/models/message.dart';
 import '../models/post.dart';
 import '../models/userinfo.dart';
@@ -30,10 +31,16 @@ abstract interface class UserRepository {
     required String uid,
     String? coverImageUrl,
   });
-  Future<void> sendMessage(String userId, String message, String userEmail);
+  Future<void> createChatGroup(List<GroupUser> usersForCreatingAGroup);
+  Future<void> sendMessage(
+      String userId, String message, String userEmail, String groupId);
   Stream<List<MessageDataModel>> getMessages();
   Stream<List<MessageDataModel>> getSingleChatMessages(
-      String fromUserId, String toUserId);
+    String fromUserId,
+    String toUserId,
+    bool isChatGroup,
+    String chatGroupId,
+  );
   Stream<List<ChatDataModel>> getAllChatsForUser(String userEmail);
   Stream<int> getUnreadChatsCount(String currentUser);
 }

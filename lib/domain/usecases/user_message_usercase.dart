@@ -3,10 +3,11 @@ import 'package:brainwavesocialapp/domain/domain.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 abstract interface class UserMessageUseCase {
-  Future<void> sentMessage(String message, String user2Email);
+  Future<void> sentMessage(String message, String user2Email, String groupId);
   Stream<List<ChatMessage>> getMessages();
   Stream<int> getUnreadChatsCount();
-  Stream<List<ChatMessage>> getSingleChatMessages(String toUserId);
+  Stream<List<ChatMessage>> getSingleChatMessages(
+      String toUserId, bool isChatGroup, String chatGroupId);
 }
 
 class _UserMessageUseCase implements UserMessageUseCase {
@@ -15,15 +16,17 @@ class _UserMessageUseCase implements UserMessageUseCase {
   final AuthRepository _authRepository;
 
   @override
-  Future<void> sentMessage(String message, String user2Email) {
+  Future<void> sentMessage(String message, String user2Email, String groupId) {
     final user = _authRepository.currentUser;
-    return _userRepository.sendMessage(user.email!, message, user2Email);
+    return _userRepository.sendMessage(
+        user.email!, message, user2Email, groupId);
   }
 
   @override
-  Stream<int> getUnreadChatsCount() {
+  Stream<int> getUnreadChatsCount() async* {
     final user = _authRepository.currentUser;
-    return _userRepository.getUnreadChatsCount(user.email!);
+    var count = _userRepository.getUnreadChatsCount(user.email!);
+    yield* count;
   }
 
   @override
@@ -40,16 +43,18 @@ class _UserMessageUseCase implements UserMessageUseCase {
   }
 
   @override
-  Stream<List<ChatMessage>> getSingleChatMessages(String toUserId) async* {
+  Stream<List<ChatMessage>> getSingleChatMessages(
+      String toUserId, bool isChatGroup, String chatGroupId) async* {
     final user = _authRepository.currentUser;
-    final messages =
-        _userRepository.getSingleChatMessages(user.email!, toUserId).map(
-              (event) => event
-                  .map(
-                    (message) => ChatMessage.fromDataModel(message),
-                  )
-                  .toList(),
-            );
+    final messages = _userRepository
+        .getSingleChatMessages(user.email!, toUserId, isChatGroup, chatGroupId)
+        .map(
+          (event) => event
+              .map(
+                (message) => ChatMessage.fromDataModel(message),
+              )
+              .toList(),
+        );
 
     yield* messages;
   }

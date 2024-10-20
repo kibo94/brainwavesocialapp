@@ -3,20 +3,21 @@ import 'package:brainwavesocialapp/domain/domain.dart';
 import 'package:flutter/material.dart';
 
 class RenderUsers extends StatelessWidget {
-  const RenderUsers({
-    super.key,
-    required this.users,
-    required this.followers,
-    required this.onFollow,
-    required this.onUnfollow,
-    required this.onNavigateToProfile,
-  });
+  const RenderUsers(
+      {super.key,
+      required this.users,
+      required this.followers,
+      required this.onFollow,
+      required this.onUnfollow,
+      required this.onNavigateToProfile,
+      this.toFolow = false});
 
   final List<AppUser> users;
   final List<String> followers;
   final void Function(String) onFollow;
   final void Function(String) onUnfollow;
   final void Function(String) onNavigateToProfile;
+  final bool toFolow;
 
   @override
   Widget build(BuildContext context) {

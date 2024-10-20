@@ -75,7 +75,11 @@ class UserProfilePage extends ConsumerWidget {
                       IconButton(
                         onPressed: () => {
                           AppRouter.go(context, RouterNames.messagePage,
-                              pathParameters: {'toUserId': user.email!})
+                              pathParameters: {
+                                'toUserId': user.email!,
+                                "isGroupChat": "false",
+                                "groupId": 'null'
+                              })
                         },
                         icon: const Icon(Icons.message_outlined),
                       ),

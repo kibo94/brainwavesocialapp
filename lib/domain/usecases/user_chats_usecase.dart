@@ -1,9 +1,11 @@
 import 'package:brainwavesocialapp/data/data.dart';
+import 'package:brainwavesocialapp/data/models/chat_group.dart';
 import 'package:brainwavesocialapp/domain/entity/chat.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 abstract interface class UserChatsUseCase {
   Stream<List<Chat>> getAllChatsForUser();
+  Future<void> createChatGroup(List<GroupUser> usersForCreatingAGroup);
 }
 
 class _UserMessageUseCase implements UserChatsUseCase {
@@ -23,6 +25,11 @@ class _UserMessageUseCase implements UserChatsUseCase {
         );
 
     yield* chats;
+  }
+
+  @override
+  Future<void> createChatGroup(List<GroupUser> usersForCreatingAGroup) {
+    return _userRepository.createChatGroup(usersForCreatingAGroup);
   }
 }
 

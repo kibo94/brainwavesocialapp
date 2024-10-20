@@ -3,6 +3,7 @@
     "configurations": [
 
 
+
         {
             "name": "brainwavesocialapp (android Simulator)",
             "request": "launch",
@@ -14,7 +15,7 @@
             "name": "brainwavesocialapp (android Simulator2)",
             "request": "launch",
             "type": "dart",
-            "deviceId": "emulator-5556",
+            "deviceId": "RZ8R222CK8T",
             "flutterMode": "debug"
         },
         {

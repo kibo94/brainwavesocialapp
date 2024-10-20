@@ -24,9 +24,23 @@ class ChatsPage extends ConsumerWidget {
         Padding(
           padding: const EdgeInsets.only(right: 16),
           child: GestureDetector(
-            child: Text(
-              "Create Group",
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            onTap: () {
+              AppRouter.go(
+                context,
+                RouterNames.createGroup,
+              );
+            },
+            child: const Row(
+              children: [
+                Text(
+                  "Create Group",
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                ),
+                GapWidgets.w8,
+                Icon(
+                  Icons.add_circle_outline,
+                )
+              ],
             ),
           ),
         )
@@ -40,6 +54,7 @@ class ChatsPage extends ConsumerWidget {
               itemCount: chats.value != null ? chats.value?.length : 0,
               itemBuilder: (context, index) {
                 final Chat chat = chats.value![index];
+                bool isChatGroup = chat.type != "group";
                 var unreadMessages = chat.unreadCount[currentUser?.email];
                 final secondUser = chat.participants.firstWhere(
                     (participant) => participant != currentUser!.email);
@@ -52,23 +67,36 @@ class ChatsPage extends ConsumerWidget {
                         AppRouter.go(
                           context,
                           RouterNames.messagePage,
-                          pathParameters: {"toUserId": secondUser},
+                          pathParameters: {
+                            "toUserId": secondUser,
+                            "isGroupChat": isChatGroup.toString(),
+                            "groupId": chat.chatId
+                          },
                         );
                       },
                       child: Row(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           UserAvatar(
-                              photoUrl: searchUsers.value!
-                                  .firstWhere(
-                                      (user) => user.email == secondUser)
-                                  .photoUrl!),
+                              photoUrl: isChatGroup
+                                  ? searchUsers.value!
+                                      .firstWhere(
+                                          (user) => user.email == secondUser)
+                                      .photoUrl!
+                                  : ""),
                           GapWidgets.w8,
                           Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             mainAxisAlignment: MainAxisAlignment.start,
                             children: [
-                              Text(secondUser),
+                              isChatGroup
+                                  ? Text(secondUser)
+                                  : Column(
+                                      children: chat.participants
+                                          .map((participant) =>
+                                              Text(participant))
+                                          .toList(),
+                                    ),
                               Text(
                                 softWrap: true,
                                 unreadMessages != null && unreadMessages > 1

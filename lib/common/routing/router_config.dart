@@ -1,5 +1,5 @@
 import 'package:brainwavesocialapp/presentation/chats/chats_page.dart';
-import 'package:brainwavesocialapp/presentation/createRoute/create_route_page.dart';
+import 'package:brainwavesocialapp/presentation/create-group/create_group_page.dart';
 import 'package:brainwavesocialapp/presentation/message/message_page.dart';
 import 'package:brainwavesocialapp/presentation/presentation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -94,12 +94,18 @@ final routerConfig = Provider<GoRouter>(
             builder: (context, state) => CreateGroupPage(),
           ),
           GoRoute(
-            path: 'messages/:toUserId',
+            path:
+                'messages/:toUserId/:isGroupChat/:groupId', // Add isGroupChat as a path parameter
             name: RouterNames.messagePage.name,
             builder: (context, state) {
               final toUserId = state.pathParameters['toUserId']!;
+              final groupId = state.pathParameters['groupId']!;
+              final isGroupChat = state.pathParameters['isGroupChat'] ==
+                  'true'; // Parse boolean
               return MessagePage(
                 toUserId: toUserId,
+                groupId: groupId,
+                isGroupChat: isGroupChat, // Pass the parsed boolean
               );
             },
           ),

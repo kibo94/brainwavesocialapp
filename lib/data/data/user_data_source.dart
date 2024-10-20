@@ -1,6 +1,8 @@
 import 'package:brainwavesocialapp/constants/collections.dart';
 import 'package:brainwavesocialapp/data/models/chat.dart';
+import 'package:brainwavesocialapp/data/models/chat_group.dart';
 import 'package:brainwavesocialapp/data/models/message.dart';
+import 'package:brainwavesocialapp/presentation/create-group/create_group_page.dart';
 import 'package:firebase_cloud_firestore/firebase_cloud_firestore.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -280,6 +282,7 @@ class _UserRemoteDataSource implements UserRepository {
     final chatCollection =
         databaseDataSource.collection(CollectionsName.chats.name);
     final querySnapshot = await chatCollection
+        .where('type', isNotEqualTo: 'group')
         .where('participants', arrayContains: fromUserEmail)
         .get();
 
@@ -297,8 +300,8 @@ class _UserRemoteDataSource implements UserRepository {
   }
 
   @override
-  Stream<List<MessageDataModel>> getSingleChatMessages(
-      String fromUserId, String toUserId) async* {
+  Stream<List<MessageDataModel>> getSingleChatMessages(String fromUserId,
+      String toUserId, bool isChatGroup, String chatGroupId) async* {
     final chatCollection = databaseDataSource.collection('chats');
 
     // Continuously listen for chats involving the fromUserId
@@ -307,18 +310,25 @@ class _UserRemoteDataSource implements UserRepository {
         .snapshots()) {
       String? chatId;
 
-      // Find the chat ID between the two users
+      // Find the chat ID based on the isChatGroup flag
       for (var doc in querySnapshot.docs) {
         List<String> participants =
             List<String>.from(doc.data()['participants']);
-        if (participants.contains(toUserId)) {
+        String chatType = doc.data()['type'];
+
+        if (chatGroupId != "null" && chatType == 'group') {
+          // For group chat, just get the chatId if it's of type "group"
+          chatId = chatGroupId;
+          break;
+        } else if (chatType == 'private' && participants.contains(toUserId)) {
+          // For private chat, ensure both users are participants
           chatId = doc.id;
           break;
         }
       }
 
       if (chatId != null) {
-        // Listen for messages in real-time and reset unread counts for both users
+        // Listen for messages in real-time
         final chatDocRef = chatCollection.doc(chatId);
 
         // Listen for real-time updates in the 'messages' subcollection
@@ -335,14 +345,10 @@ class _UserRemoteDataSource implements UserRepository {
 
             // Check if unread counts need to be reset
             final unreadCount = chatData['unreadCount'] as Map<String, dynamic>;
-
-            // If either user has unread messages, reset their counts to 0
-
+            unreadCount[fromUserId] = 0;
+            // Reset unread counts for both users
             await chatDocRef.update({
-              'unreadCount': {
-                fromUserId: 0, // Reset unread count for fromUserId
-                toUserId: unreadCount[toUserId]
-              },
+              'unreadCount': unreadCount,
             });
           }
 
@@ -355,7 +361,7 @@ class _UserRemoteDataSource implements UserRepository {
           }).toList();
         });
       } else {
-        // If no chat found, yield an empty list
+        // If no valid chat found, yield an empty list
         yield [];
       }
     }
@@ -375,19 +381,19 @@ class _UserRemoteDataSource implements UserRepository {
       for (var doc in querySnapshot.docs) {
         final data = doc.data();
 
-        // Check if the 'unreadCount' field exists and if currentUserId has unread messages
+        // Check if the 'unreadCount' field exists and contains currentUserId
         if (data.containsKey('unreadCount') &&
             data['unreadCount'][currentUserId] != null) {
           final unreadCountForUser = data['unreadCount'][currentUserId];
 
-          // Increment count if the unread count for the user is greater than 0
+          // Increment count if the unread count for the current user is greater than 0
           if (unreadCountForUser > 0) {
             unreadChatsCount++;
           }
         }
       }
 
-      // Emit the updated unread chats count
+      // Emit the updated unread chats count for the current user
       yield unreadChatsCount;
     }
   }
@@ -420,12 +426,57 @@ class _UserRemoteDataSource implements UserRepository {
   }
 
   @override
-  Future<void> sendMessage(
-      String fromUserEmail, String message, String toUserEmail) async {
+  Future<void> createChatGroup(List<GroupUser> usersForCreatingAGroup) async {
+    var chatCollection =
+        FirebaseFirestore.instance.collection(CollectionsName.chats.name);
+    var unreadCount = {};
+    usersForCreatingAGroup.sublist(1).forEach((GroupUser user) => {
+          unreadCount[user.email] = 1,
+          unreadCount[usersForCreatingAGroup[0].email] = 0
+        });
+
+    final newChat = {
+      'type': "group",
+      'lastMessage': "Dobro dosli u grupu",
+      'lastMessageTimestamp': FieldValue.serverTimestamp(),
+      'participants':
+          usersForCreatingAGroup.map((usGroup) => usGroup.email).toList(),
+      'unreadCount': unreadCount
+    };
+    final chatDoc = await chatCollection.add(newChat);
+    // Step 5: Create the new message data
+    final newMessage = MessageDataModel(
+      uid: '',
+      content: 'Dobro dosli u grupu',
+      messageType: "text",
+      readBy: [usersForCreatingAGroup[0].email],
+      senderId: usersForCreatingAGroup[0].email,
+      timestamp: DateTime.now(),
+    );
+
+    // Step 6: Add the message to the 'messages' subcollection in the chat
+    final messageCollection =
+        chatCollection.doc(chatDoc.id).collection('messages');
+    await messageCollection
+        .withConverter<MessageDataModel>(
+          fromFirestore: (snapshot, _) => MessageDataModel.fromJson({
+            ...snapshot.data()!,
+            'uid': snapshot.id,
+          }),
+          toFirestore: (post, _) => post.toJson(),
+        )
+        .add(newMessage);
+  }
+
+  @override
+  Future<void> sendMessage(String fromUserEmail, String message,
+      String toUserEmail, String groupId) async {
     try {
       var chatCollection =
           databaseDataSource.collection(CollectionsName.chats.name);
-      String? chatId = await getChatId(fromUserEmail, toUserEmail);
+      String? chatId = groupId != "null"
+          ? groupId
+          : await getChatId(fromUserEmail, toUserEmail);
 
       // // Step 3: If chat does not exist, create a new one
       if (chatId == null) {
@@ -449,19 +500,20 @@ class _UserRemoteDataSource implements UserRepository {
         if (chatSnapshot.exists) {
           final chatData = chatSnapshot.data() as Map<String, dynamic>;
           final unreadCount = chatData['unreadCount'] as Map<String, dynamic>;
-
+          final participants = chatData['participants'];
           // Increment the unread count for the recipient
-          final newUnreadCount = unreadCount[toUserEmail] != null
-              ? unreadCount[toUserEmail] + 1
-              : 1;
+          // final newUnreadCount = unreadCount[toUserEmail] != null
+          //     ? unreadCount[toUserEmail] + 1
+          //     : 1;
+          final updatedUnreadCount = {};
+          participants.forEach((participant) =>
+              {updatedUnreadCount[participant] = unreadCount[participant] + 1});
+          updatedUnreadCount[fromUserEmail] = 0;
 
           await chatDoc.update({
             'lastMessage': message,
             'lastMessageTimestamp': FieldValue.serverTimestamp(),
-            'unreadCount': {
-              fromUserEmail: 0,
-              toUserEmail: newUnreadCount,
-            }
+            'unreadCount': updatedUnreadCount
           });
         }
       }

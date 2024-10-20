@@ -102,7 +102,7 @@ class FeedsPage extends ConsumerWidget {
                         );
                         AppRouter.go(
                           context,
-                          RouterNames.userProfilePage,
+                          RouterNames.chats,
                           pathParameters: {
                             'userId': currentUser.value!.uid,
                           },

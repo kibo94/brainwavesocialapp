@@ -1,4 +1,5 @@
 import 'package:brainwavesocialapp/data/models/chat.dart';
+import 'package:brainwavesocialapp/data/models/chat_group.dart';
 import 'package:brainwavesocialapp/data/models/message.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../data/user_data_source.dart';
@@ -39,8 +40,18 @@ class _UserRepository implements UserRepository {
   }
 
   @override
-  Future<void> sendMessage(String userId, String message, String userEmail) {
-    return databaseDataSource.sendMessage(userId, message, userEmail);
+  Future<void> sendMessage(
+      String userId, String message, String userEmail, String groupId) {
+    return databaseDataSource.sendMessage(userId, message, userEmail, groupId);
+  }
+
+  @override
+  Future<void> createChatGroup(
+    List<GroupUser> usersForCreatingAGroup,
+  ) {
+    return databaseDataSource.createChatGroup(
+      usersForCreatingAGroup,
+    );
   }
 
   @override
@@ -49,9 +60,10 @@ class _UserRepository implements UserRepository {
   }
 
   @override
-  Stream<List<MessageDataModel>> getSingleChatMessages(
-      String fromUserId, String toUserId) {
-    return databaseDataSource.getSingleChatMessages(fromUserId, toUserId);
+  Stream<List<MessageDataModel>> getSingleChatMessages(String fromUserId,
+      String toUserId, bool isChatGroup, String chatGroupId) {
+    return databaseDataSource.getSingleChatMessages(
+        fromUserId, toUserId, isChatGroup, chatGroupId);
   }
 
   @override

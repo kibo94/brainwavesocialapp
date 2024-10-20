@@ -1,11 +1,14 @@
 import 'package:brainwavesocialapp/domain/domain.dart';
 import 'package:brainwavesocialapp/domain/usecases/user_message_usercase.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:tuple/tuple.dart';
 
 final sendMessageStateProvider =
     FutureProvider.autoDispose.family<void, List<String>>(
   (ref, data) async {
-    return ref.watch(userMessageCaseProvider).sentMessage(data[0], data[1]);
+    return ref
+        .watch(userMessageCaseProvider)
+        .sentMessage(data[0], data[1], data[2]);
   },
 );
 
@@ -15,9 +18,14 @@ final messagesProvider = StreamProvider.autoDispose<List<ChatMessage>>(
   },
 );
 
-final singleMessageProvider =
-    StreamProvider.autoDispose.family<List<ChatMessage>, String>(
-  (ref, toEmail) {
-    return ref.watch(userMessageCaseProvider).getSingleChatMessages(toEmail);
+final singleMessageProvider = StreamProvider.autoDispose
+    .family<List<ChatMessage>, Tuple3<String, bool, String>>(
+  (ref, data) {
+    final firstParam = data.item1; // First string parameter
+    final secondParam = data.item2; // Second string parameter
+    final chatGroupId = data.item3;
+    return ref
+        .watch(userMessageCaseProvider)
+        .getSingleChatMessages(firstParam, secondParam, chatGroupId);
   },
 );

@@ -4,16 +4,28 @@ import 'package:brainwavesocialapp/presentation/message/message_state.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:tuple/tuple.dart';
 
 class MessagePage extends ConsumerWidget {
   final TextEditingController _controller = TextEditingController();
   final ScrollController _scrollController = ScrollController();
+  final bool isGroupChat;
   final String toUserId;
+  final String groupId;
 
-  MessagePage({super.key, required this.toUserId});
+  MessagePage(
+      {super.key,
+      required this.toUserId,
+      required this.isGroupChat,
+      required this.groupId});
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final messages = ref.watch(singleMessageProvider(toUserId));
+    print(toUserId);
+    print(isGroupChat);
+    print(groupId);
+    final messages = ref
+        .watch(singleMessageProvider(Tuple3(toUserId, isGroupChat, groupId)));
+
     void scrollToBottom() {
       if (_scrollController.hasClients) {
         _scrollController
@@ -99,7 +111,8 @@ class MessagePage extends ConsumerWidget {
                   onPressed: () {
                     String message = _controller.text.trim();
                     if (message.isNotEmpty) {
-                      ref.read(sendMessageStateProvider([message, toUserId]));
+                      ref.read(sendMessageStateProvider(
+                          [message, toUserId, groupId]));
                       scrollToBottom();
                       // Close the keyboard
                       FocusScope.of(context).unfocus(); // Dismiss the keyboard
