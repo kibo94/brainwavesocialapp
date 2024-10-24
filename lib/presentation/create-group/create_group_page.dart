@@ -1,5 +1,7 @@
 import 'package:brainwavesocialapp/common/common.dart';
 import 'package:brainwavesocialapp/data/models/chat_group.dart';
+import 'package:brainwavesocialapp/domain/entity/chat.dart';
+import 'package:brainwavesocialapp/presentation/chats/chats_state.dart';
 import 'package:brainwavesocialapp/presentation/create-group/create_group_state.dart';
 import 'package:brainwavesocialapp/presentation/profile/state/profile_state.dart';
 import 'package:brainwavesocialapp/presentation/search/search_state.dart';
@@ -33,6 +35,34 @@ class _CreateGroupPageState extends ConsumerState<CreateGroupPage> {
   Widget build(BuildContext context) {
     final currentUser = ref.watch(currentUserStateProvider).valueOrNull;
     final searchUsers = ref.watch(searchUsersStateProvider);
+    final chats = ref.watch(chatsProvider);
+    Chat? findChatWithParticipants(List<GroupUser> participants) {
+      try {
+        // Convert the provided participants to a set of emails
+        final participantEmails =
+            participants.map((user) => user.email).toSet();
+        final chatList = chats.value;
+
+        // Check if chatList is null or empty and handle accordingly
+        if (chatList == null || chatList.isEmpty) {
+          return null; // Return null if there are no chats
+        }
+
+        // Use firstWhere with orElse to find the chat where all participants match exactly
+        return chatList.firstWhere(
+          (chat) {
+            final chatParticipants = chat.participants.toSet();
+            // Check if the number of participants matches and if all participants are in both sets
+            return chatParticipants.length == participantEmails.length &&
+                chatParticipants.containsAll(participantEmails);
+          },
+        );
+      } catch (e) {
+        // Handle any errors that occur
+        print('Error: $e');
+        return null; // Return null or handle the error as needed
+      }
+    }
 
     return CommonPageScaffold(
       centerTitle: false,
@@ -150,34 +180,49 @@ class _CreateGroupPageState extends ConsumerState<CreateGroupPage> {
                 Container(
                   margin: const EdgeInsets.only(bottom: 20),
                   child: HighlightButton(
-                      text: "Create group",
-                      onPressed: () async {
-                        setState(() {
-                          usersForCreatingAGroup.insert(
-                              0,
-                              GroupUser(
-                                imgUrl: currentUser!.avatar,
-                                email: currentUser.email!,
-                              ));
-                        });
+                    text: "Create group",
+                    onPressed: () async {
+                      var chatId;
+                      var prts = [
+                        GroupUser(
+                            imgUrl: currentUser!.avatar,
+                            email: currentUser.email!),
+                        ...usersForCreatingAGroup
+                      ];
+                      Chat? foundChat = findChatWithParticipants(prts);
+
+                      setState(() {
+                        usersForCreatingAGroup.insert(
+                            0,
+                            GroupUser(
+                              imgUrl: currentUser.avatar,
+                              email: currentUser.email!,
+                            ));
+                      });
+                      if (foundChat == null) {
                         var id = await ref.read(
                             createChatProvider(usersForCreatingAGroup).future);
+                        chatId = id;
+                      }
 
-                        setState(() {
-                          usersForCreatingAGroup = [];
-                        });
-                        AppRouter.go(
-                          context,
-                          RouterNames.messagePage,
-                          pathParameters: {
-                            "toUserId": 'Grupa',
-                            "isGroupChat": 'true',
-                            "groupId": id
-                          },
-                        );
-                        // make sure the form is valid
-                        // before submitting
-                      }),
+                      setState(() {
+                        usersForCreatingAGroup = [];
+                      });
+                      AppRouter.go(
+                        context,
+                        RouterNames.messagePage,
+                        pathParameters: {
+                          "toUserId": foundChat == null
+                              ? 'Grupa'
+                              : foundChat.participants[1],
+                          "isGroupChat":
+                              (foundChat?.type == "group").toString(),
+                          "groupId":
+                              foundChat != null ? foundChat.chatId : chatId
+                        },
+                      );
+                    },
+                  ),
                 ),
             ],
           );

@@ -137,7 +137,7 @@ class ChatsPage extends ConsumerWidget {
   Widget _buildPopupMenu(BuildContext context, Chat chat, WidgetRef ref) {
     return PopupMenuButton<String>(
       icon: const Icon(Icons.more_vert),
-      padding: EdgeInsets.all(4),
+      padding: const EdgeInsets.all(4),
       onSelected: (value) {
         // Handle actions based on the selected value
         switch (value) {
