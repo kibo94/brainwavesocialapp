@@ -43,4 +43,5 @@ abstract interface class UserRepository {
   );
   Stream<List<ChatDataModel>> getAllChatsForUser(String userEmail);
   Stream<int> getUnreadChatsCount(String currentUser);
+  Future<void> deleteChat(String chatId);
 }

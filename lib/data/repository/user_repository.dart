@@ -55,6 +55,11 @@ class _UserRepository implements UserRepository {
   }
 
   @override
+  Future<void> deleteChat(String chatId) async {
+    return databaseDataSource.deleteChat(chatId);
+  }
+
+  @override
   Stream<List<MessageDataModel>> getMessages() {
     return databaseDataSource.getMessages();
   }

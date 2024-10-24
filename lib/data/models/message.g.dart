@@ -15,6 +15,7 @@ MessageDataModel _$MessageDataModelFromJson(Map<String, dynamic> json) =>
       messageType: json['messageType'] as String,
       readBy:
           (json['readBy'] as List<dynamic>).map((e) => e as String).toList(),
+      avatar: json['avatar'] as String?,
     );
 
 Map<String, dynamic> _$MessageDataModelToJson(MessageDataModel instance) =>
@@ -23,5 +24,6 @@ Map<String, dynamic> _$MessageDataModelToJson(MessageDataModel instance) =>
       'content': instance.content,
       'messageType': instance.messageType,
       'readBy': instance.readBy,
+      'avatar': instance.avatar,
       'timestamp': TimestampConverter.toJson(instance.timestamp),
     };

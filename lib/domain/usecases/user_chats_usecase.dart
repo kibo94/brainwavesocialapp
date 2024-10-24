@@ -6,6 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 abstract interface class UserChatsUseCase {
   Stream<List<Chat>> getAllChatsForUser();
   Future<String> createChatGroup(List<GroupUser> usersForCreatingAGroup);
+  Future<void> deleteChat(String chatId);
 }
 
 class _UserMessageUseCase implements UserChatsUseCase {
@@ -30,6 +31,11 @@ class _UserMessageUseCase implements UserChatsUseCase {
   @override
   Future<String> createChatGroup(List<GroupUser> usersForCreatingAGroup) {
     return _userRepository.createChatGroup(usersForCreatingAGroup);
+  }
+
+  @override
+  Future<void> deleteChat(String chatId) {
+    return _userRepository.deleteChat(chatId);
   }
 }
 

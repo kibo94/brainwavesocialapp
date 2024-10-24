@@ -1,4 +1,3 @@
-import 'package:brainwavesocialapp/common/routing/router.dart';
 import 'package:brainwavesocialapp/constants/collections.dart';
 import 'package:brainwavesocialapp/data/models/chat.dart';
 import 'package:brainwavesocialapp/data/models/chat_group.dart';
@@ -455,6 +454,9 @@ class _UserRemoteDataSource implements UserRepository {
   @override
   Future<void> sendMessage(String fromUserEmail, String message,
       String toUserEmail, String idOfChat) async {
+    var userCollection = FirebaseFirestore.instance
+        .collection(CollectionsName.users.name)
+        .where('email', isEqualTo: fromUserEmail);
     try {
       var chatCollection =
           databaseDataSource.collection(CollectionsName.chats.name);
@@ -501,6 +503,10 @@ class _UserRemoteDataSource implements UserRepository {
         }
       }
 
+      var querySnapshot = await userCollection.get();
+
+      var userDoc = querySnapshot.docs.first;
+      String? avatarUrl = userDoc.data()['photoUrl'];
       // Step 5: Create the new message data
       final newMessage = MessageDataModel(
         uid: '',
@@ -508,6 +514,7 @@ class _UserRemoteDataSource implements UserRepository {
         messageType: "text",
         readBy: [fromUserEmail],
         senderId: fromUserEmail,
+        avatar: avatarUrl,
         timestamp: DateTime.now(),
       );
 
@@ -525,6 +532,24 @@ class _UserRemoteDataSource implements UserRepository {
           .add(newMessage);
     } catch (e) {
       throw const FireBaseException();
+    }
+  }
+
+  @override
+  Future<void> deleteChat(String chatId) async {
+    try {
+      // Reference to the chat collection
+      var chatCollection =
+          databaseDataSource.collection(CollectionsName.chats.name);
+
+      // Reference to the specific chat document
+      var chatDocRef = chatCollection.doc(chatId);
+
+      // Delete the chat document
+      await chatDocRef.delete();
+    } catch (e) {
+      print("Error deleting chat: $e");
+      // Handle any errors (e.g., log them or show a message to the user)
     }
   }
 }

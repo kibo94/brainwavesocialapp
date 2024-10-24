@@ -22,7 +22,6 @@ class MessagePage extends ConsumerWidget {
       required this.groupId});
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final searchUsers = ref.read(searchUsersStateProvider);
     final messages = ref
         .watch(singleMessageProvider(Tuple3(toUserId, isGroupChat, groupId)));
 
@@ -64,16 +63,16 @@ class MessagePage extends ConsumerWidget {
                     decoration: const BoxDecoration(),
                     child: Align(
                       alignment: Alignment.centerLeft,
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
-                          // if (avatar != null)
-                          //   CircleAvatar(
-                          //     backgroundImage: NetworkImage(avatar),
-                          //     radius: 30,
-                          //   ),
-                          Text(chatMessage.senderId),
-                          GapWidgets.h8,
+                          if (chatMessage.avatar != null)
+                            CircleAvatar(
+                              backgroundImage:
+                                  NetworkImage(chatMessage.avatar!),
+                              radius: 30,
+                            ),
+                          GapWidgets.w8,
                           Container(
                             width: 200,
                             decoration: BoxDecoration(
@@ -91,7 +90,8 @@ class MessagePage extends ConsumerWidget {
                                   ),
                                   Text(
                                     softWrap: true,
-                                    DateFormat().format(chatMessage.timestamp),
+                                    DateFormat("d MMMM HH:mm")
+                                        .format(chatMessage.timestamp),
                                     style: const TextStyle(fontSize: 16),
                                   ),
                                 ],

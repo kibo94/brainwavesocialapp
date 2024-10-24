@@ -6,14 +6,14 @@ part 'message.g.dart';
 
 @JsonSerializable()
 class MessageDataModel {
-  MessageDataModel({
-    required this.uid,
-    required this.senderId,
-    required this.content,
-    required this.timestamp,
-    required this.messageType,
-    required this.readBy,
-  });
+  MessageDataModel(
+      {required this.uid,
+      required this.senderId,
+      required this.content,
+      required this.timestamp,
+      required this.messageType,
+      required this.readBy,
+      this.avatar});
 
   @JsonKey(includeToJson: false)
   final String uid;
@@ -21,6 +21,7 @@ class MessageDataModel {
   final String content;
   final String messageType;
   final List<String> readBy;
+  final String? avatar;
 
   @JsonKey(
     fromJson: TimestampConverter.fromJson,

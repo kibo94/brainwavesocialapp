@@ -7,3 +7,9 @@ final chatsProvider = StreamProvider.autoDispose<List<Chat>>(
     return ref.watch(userChatsCaseProvider).getAllChatsForUser();
   },
 );
+
+final deleteChatProvider = FutureProvider.autoDispose.family<void, String>(
+  (ref, id) async {
+    return ref.watch(userChatsCaseProvider).deleteChat(id);
+  },
+);
