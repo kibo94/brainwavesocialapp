@@ -91,7 +91,7 @@ final routerConfig = Provider<GoRouter>(
           GoRoute(
             path: 'createGroup',
             name: RouterNames.createGroup.name,
-            builder: (context, state) => CreateGroupPage(),
+            builder: (context, state) => const CreateGroupPage(),
           ),
           GoRoute(
             path:
@@ -99,7 +99,7 @@ final routerConfig = Provider<GoRouter>(
             name: RouterNames.messagePage.name,
             builder: (context, state) {
               final toUserId = state.pathParameters['toUserId']!;
-              final groupId = state.pathParameters['groupId']!;
+              String? groupId = state.pathParameters['groupId']!;
               final isGroupChat = state.pathParameters['isGroupChat'] ==
                   'true'; // Parse boolean
               return MessagePage(

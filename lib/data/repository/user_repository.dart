@@ -46,9 +46,9 @@ class _UserRepository implements UserRepository {
   }
 
   @override
-  Future<void> createChatGroup(
+  Future<String> createChatGroup(
     List<GroupUser> usersForCreatingAGroup,
-  ) {
+  ) async {
     return databaseDataSource.createChatGroup(
       usersForCreatingAGroup,
     );

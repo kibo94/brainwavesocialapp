@@ -78,7 +78,7 @@ class UserProfilePage extends ConsumerWidget {
                               pathParameters: {
                                 'toUserId': user.email!,
                                 "isGroupChat": "false",
-                                "groupId": 'null'
+                                "groupId": "null",
                               })
                         },
                         icon: const Icon(Icons.message_outlined),

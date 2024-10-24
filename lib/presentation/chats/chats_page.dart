@@ -54,7 +54,7 @@ class ChatsPage extends ConsumerWidget {
               itemCount: chats.value != null ? chats.value?.length : 0,
               itemBuilder: (context, index) {
                 final Chat chat = chats.value![index];
-                bool isChatGroup = chat.type != "group";
+                bool isChatGroup = chat.type == "group";
                 var unreadMessages = chat.unreadCount[currentUser?.email];
                 final secondUser = chat.participants.firstWhere(
                     (participant) => participant != currentUser!.email);
@@ -78,7 +78,7 @@ class ChatsPage extends ConsumerWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           UserAvatar(
-                              photoUrl: isChatGroup
+                              photoUrl: !isChatGroup
                                   ? searchUsers.value!
                                       .firstWhere(
                                           (user) => user.email == secondUser)
@@ -89,7 +89,7 @@ class ChatsPage extends ConsumerWidget {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             mainAxisAlignment: MainAxisAlignment.start,
                             children: [
-                              isChatGroup
+                              !isChatGroup
                                   ? Text(secondUser)
                                   : Column(
                                       children: chat.participants

@@ -19,10 +19,8 @@ final signOutStateProvider = Provider<Future<void>>(
     return ref.watch(userUseCaseProvider).signOut();
   },
 );
-final unreadChatsProvider = StreamProvider<int>(
+final unreadChatsProvider = StreamProvider.autoDispose<int>(
   (ref) {
-    // Retrieve the current user's ID from the auth repository
-    // Fetch the unread chats count as a stream using currentUserId
-    return ref.read(userMessageCaseProvider).getUnreadChatsCount();
+    return ref.watch(userMessageCaseProvider).getUnreadChatsCount();
   },
 );

@@ -1,10 +1,12 @@
 import 'package:brainwavesocialapp/common/common.dart';
 import 'package:brainwavesocialapp/domain/domain.dart';
 import 'package:brainwavesocialapp/presentation/message/message_state.dart';
+import 'package:brainwavesocialapp/presentation/search/search_state.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:tuple/tuple.dart';
+import 'package:intl/intl.dart';
 
 class MessagePage extends ConsumerWidget {
   final TextEditingController _controller = TextEditingController();
@@ -20,9 +22,7 @@ class MessagePage extends ConsumerWidget {
       required this.groupId});
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    print(toUserId);
-    print(isGroupChat);
-    print(groupId);
+    final searchUsers = ref.read(searchUsersStateProvider);
     final messages = ref
         .watch(singleMessageProvider(Tuple3(toUserId, isGroupChat, groupId)));
 
@@ -44,7 +44,7 @@ class MessagePage extends ConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(toUserId),
+        title: Text(!isGroupChat ? toUserId : "Grupa"),
       ),
       body: Column(
         children: [
@@ -56,6 +56,7 @@ class MessagePage extends ConsumerWidget {
               itemCount: messages.value != null ? messages.value?.length : 0,
               itemBuilder: (context, index) {
                 final ChatMessage chatMessage = messages.value![index];
+
                 return Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: Container(
@@ -66,6 +67,11 @@ class MessagePage extends ConsumerWidget {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
+                          // if (avatar != null)
+                          //   CircleAvatar(
+                          //     backgroundImage: NetworkImage(avatar),
+                          //     radius: 30,
+                          //   ),
                           Text(chatMessage.senderId),
                           GapWidgets.h8,
                           Container(
@@ -75,10 +81,20 @@ class MessagePage extends ConsumerWidget {
                                 color: Colors.black26),
                             child: Padding(
                               padding: const EdgeInsets.all(8.0),
-                              child: Text(
-                                softWrap: true,
-                                chatMessage.content,
-                                style: const TextStyle(fontSize: 16),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    softWrap: true,
+                                    chatMessage.content,
+                                    style: const TextStyle(fontSize: 16),
+                                  ),
+                                  Text(
+                                    softWrap: true,
+                                    DateFormat().format(chatMessage.timestamp),
+                                    style: const TextStyle(fontSize: 16),
+                                  ),
+                                ],
                               ),
                             ),
                           ),

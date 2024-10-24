@@ -148,7 +148,7 @@ class _CreateGroupPageState extends ConsumerState<CreateGroupPage> {
               ),
               if (usersForCreatingAGroup.isNotEmpty)
                 Container(
-                  margin: EdgeInsets.only(bottom: 20),
+                  margin: const EdgeInsets.only(bottom: 20),
                   child: HighlightButton(
                       text: "Create group",
                       onPressed: () async {
@@ -160,13 +160,20 @@ class _CreateGroupPageState extends ConsumerState<CreateGroupPage> {
                                 email: currentUser.email!,
                               ));
                         });
-                        ref.read(createChatProvider(usersForCreatingAGroup));
+                        var id = await ref.read(
+                            createChatProvider(usersForCreatingAGroup).future);
+
                         setState(() {
                           usersForCreatingAGroup = [];
                         });
                         AppRouter.go(
                           context,
-                          RouterNames.chats,
+                          RouterNames.messagePage,
+                          pathParameters: {
+                            "toUserId": 'Grupa',
+                            "isGroupChat": 'true',
+                            "groupId": id
+                          },
                         );
                         // make sure the form is valid
                         // before submitting

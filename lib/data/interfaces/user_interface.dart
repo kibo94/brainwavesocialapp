@@ -31,7 +31,7 @@ abstract interface class UserRepository {
     required String uid,
     String? coverImageUrl,
   });
-  Future<void> createChatGroup(List<GroupUser> usersForCreatingAGroup);
+  Future<String> createChatGroup(List<GroupUser> usersForCreatingAGroup);
   Future<void> sendMessage(
       String userId, String message, String userEmail, String groupId);
   Stream<List<MessageDataModel>> getMessages();

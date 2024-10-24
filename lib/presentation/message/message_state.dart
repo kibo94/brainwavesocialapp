@@ -21,11 +21,11 @@ final messagesProvider = StreamProvider.autoDispose<List<ChatMessage>>(
 final singleMessageProvider = StreamProvider.autoDispose
     .family<List<ChatMessage>, Tuple3<String, bool, String>>(
   (ref, data) {
-    final firstParam = data.item1; // First string parameter
-    final secondParam = data.item2; // Second string parameter
-    final chatGroupId = data.item3;
+    final message = data.item1; // First string parameter
+    final toUser = data.item2; // Second string parameter
+    final chatId = data.item3;
     return ref
         .watch(userMessageCaseProvider)
-        .getSingleChatMessages(firstParam, secondParam, chatGroupId);
+        .getSingleChatMessages(message, toUser, chatId);
   },
 );
