@@ -1,4 +1,5 @@
 import 'package:brainwavesocialapp/common/common.dart';
+import 'package:brainwavesocialapp/presentation/profile/state/profile_state.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -12,12 +13,13 @@ class SearchPage extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final searchUsers = ref.watch(searchUsersStateProvider);
     final followers = ref.watch(currentUserFollowingsStateProvider);
-
+    final currentUser = ref.watch(currentUserStateProvider).valueOrNull;
     return CommonPageScaffold(
       title: 'Search',
       child: searchUsers.when(
         data: (users) {
           return RenderUsers(
+            currentUser: currentUser!,
             users: users,
             followers: followers.asData != null ? followers.asData!.value : [],
             onFollow: (userId) {

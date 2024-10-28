@@ -1,6 +1,7 @@
 import 'package:brainwavesocialapp/common/common.dart';
 import 'package:brainwavesocialapp/domain/domain.dart';
 import 'package:brainwavesocialapp/presentation/message/message_state.dart';
+import 'package:brainwavesocialapp/presentation/profile/state/profile_state.dart';
 import 'package:brainwavesocialapp/presentation/search/search_state.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
@@ -22,9 +23,10 @@ class MessagePage extends ConsumerWidget {
       required this.groupId});
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final searchUsers = ref.watch(searchUsersStateProvider);
     final messages = ref
         .watch(singleMessageProvider(Tuple3(toUserId, isGroupChat, groupId)));
-
+    final currentUser = ref.watch(currentUserStateProvider).valueOrNull;
     void scrollToBottom() {
       if (_scrollController.hasClients) {
         _scrollController
@@ -67,10 +69,25 @@ class MessagePage extends ConsumerWidget {
                         crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
                           if (chatMessage.avatar != null)
-                            CircleAvatar(
-                              backgroundImage:
-                                  NetworkImage(chatMessage.avatar!),
-                              radius: 30,
+                            GestureDetector(
+                              onTap: () {
+                                AppUser? user = searchUsers.value?.firstWhere(
+                                    (searchUser) =>
+                                        searchUser.email ==
+                                        chatMessage.senderId,
+                                    orElse: () => currentUser!);
+
+                                AppRouter.go(
+                                  context,
+                                  RouterNames.userProfilePage,
+                                  pathParameters: {'userId': user!.id},
+                                );
+                              },
+                              child: CircleAvatar(
+                                backgroundImage:
+                                    NetworkImage(chatMessage.avatar!),
+                                radius: 30,
+                              ),
                             ),
                           GapWidgets.w8,
                           Container(

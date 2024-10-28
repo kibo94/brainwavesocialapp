@@ -1,6 +1,7 @@
 import 'package:brainwavesocialapp/data/models/chat.dart';
 import 'package:brainwavesocialapp/data/models/chat_group.dart';
 import 'package:brainwavesocialapp/data/models/message.dart';
+import 'package:brainwavesocialapp/domain/domain.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../data/user_data_source.dart';
 import '../interfaces/user_interface.dart';
@@ -22,6 +23,11 @@ class _UserRepository implements UserRepository {
   @override
   Future<List<PostDataModel>> getUserPosts(String uid) {
     return databaseDataSource.getUserPosts(uid);
+  }
+
+  @override
+  Future<void> blockTheUser(AppUser user, String userToBlock) {
+    return databaseDataSource.blockTheUser(user, userToBlock);
   }
 
   @override

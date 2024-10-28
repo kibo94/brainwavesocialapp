@@ -1,6 +1,7 @@
 import 'package:brainwavesocialapp/data/models/chat.dart';
 import 'package:brainwavesocialapp/data/models/chat_group.dart';
 import 'package:brainwavesocialapp/data/models/message.dart';
+import 'package:brainwavesocialapp/domain/domain.dart';
 import '../models/post.dart';
 import '../models/userinfo.dart';
 
@@ -12,7 +13,7 @@ abstract interface class UserRepository {
   Future<void> followUser(String currentUserId, String idUserToFollow);
   Future<void> unFollowUser(String currentUserId, String idUserToUnfollow);
   Stream<bool> userLikedAPost(String postId, String userId);
-
+  Future<void> blockTheUser(AppUser user, String userToBlock);
   Future<List<UserInfoDataModel>> searchUsers();
   Future<void> editUserProfile({
     required String uid,

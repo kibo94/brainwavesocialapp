@@ -19,6 +19,9 @@ UserInfoDataModel _$UserInfoDataModelFromJson(Map<String, dynamic> json) =>
       deviceTokens: (json['deviceTokens'] as List<dynamic>?)
           ?.map((e) => e as String)
           .toList(),
+      isBlockBy: (json['isBlockBy'] as List<dynamic>?)
+          ?.map((e) => e as String)
+          .toList(),
     );
 
 Map<String, dynamic> _$UserInfoDataModelToJson(UserInfoDataModel instance) =>
@@ -32,4 +35,5 @@ Map<String, dynamic> _$UserInfoDataModelToJson(UserInfoDataModel instance) =>
       'coverImageUrl': instance.coverImageUrl,
       'bio': instance.bio,
       'deviceTokens': instance.deviceTokens,
+      'isBlockBy': instance.isBlockBy,
     };

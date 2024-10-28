@@ -1,6 +1,7 @@
 import 'package:brainwavesocialapp/data/data.dart';
 import 'package:brainwavesocialapp/domain/domain.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:tuple/tuple.dart';
 
 final userProfileProvider = StreamProvider.family<AppUser?, String>(
   (ref, uid) {
@@ -15,6 +16,16 @@ final userPostsProvider = FutureProvider.autoDispose.family<List<Post>, String>(
           userUseCaseProvider,
         )
         .getUserPosts(uid);
+  },
+);
+
+final blockUserProvider =
+    FutureProvider.autoDispose.family<void, Tuple2<AppUser, String>>(
+  (ref, data) {
+    final user = data.item1; // First string parameter
+    final blockedUserEmail = data.item2; // Second string parameter
+
+    return ref.watch(userUseCaseProvider).blockTheUser(user, blockedUserEmail);
   },
 );
 

@@ -1,11 +1,13 @@
 import 'package:brainwavesocialapp/common/common.dart';
 import 'package:brainwavesocialapp/domain/domain.dart';
+import 'package:brainwavesocialapp/presentation/utils/user_util.dart';
 import 'package:flutter/material.dart';
 
 class RenderUsers extends StatelessWidget {
   const RenderUsers(
       {super.key,
       required this.users,
+      required this.currentUser,
       required this.followers,
       required this.onFollow,
       required this.onUnfollow,
@@ -18,6 +20,7 @@ class RenderUsers extends StatelessWidget {
   final void Function(String) onUnfollow;
   final void Function(String) onNavigateToProfile;
   final bool toFolow;
+  final AppUser currentUser;
 
   @override
   Widget build(BuildContext context) {
@@ -41,18 +44,19 @@ class RenderUsers extends StatelessWidget {
                 },
               ),
             ),
-            ElevatedButton(
-              onPressed: () {
-                if (hasFollowed) {
-                  onUnfollow(user.uid);
-                } else {
-                  onFollow(user.uid);
-                }
-              },
-              child: Text(
-                hasFollowed ? 'Unfollow' : 'Follow',
-              ),
-            )
+            if (!UserUtil.isUserBlocked(currentUser, user))
+              ElevatedButton(
+                onPressed: () {
+                  if (hasFollowed) {
+                    onUnfollow(user.uid);
+                  } else {
+                    onFollow(user.uid);
+                  }
+                },
+                child: Text(
+                  hasFollowed ? 'Unfollow' : 'Follow',
+                ),
+              )
           ],
         );
       },

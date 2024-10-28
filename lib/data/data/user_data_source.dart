@@ -3,6 +3,7 @@ import 'package:brainwavesocialapp/data/models/chat.dart';
 import 'package:brainwavesocialapp/data/models/chat_group.dart';
 import 'package:brainwavesocialapp/data/models/message.dart';
 import 'package:brainwavesocialapp/data/utils/chat_utils.dart';
+import 'package:brainwavesocialapp/domain/domain.dart';
 import 'package:firebase_cloud_firestore/firebase_cloud_firestore.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -181,6 +182,21 @@ class _UserRemoteDataSource implements UserRepository {
         'bio': bio,
       },
     );
+  }
+
+  @override
+  Future<void> blockTheUser(AppUser user, String userToBlock) {
+    List<String> isBlockBy = [...user.isBlockBy!];
+    if (!isBlockBy.contains(userToBlock)) {
+      isBlockBy.add(userToBlock);
+    }
+
+    return databaseDataSource
+        .collection(CollectionsName.users.name)
+        .doc(user.uid)
+        .update({
+      'isBlockBy': isBlockBy,
+    });
   }
 
   @override

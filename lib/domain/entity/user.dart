@@ -4,17 +4,17 @@ import 'package:flutter/material.dart';
 
 @immutable
 class AppUser extends UserInfoDataModel {
-  const AppUser({
-    required super.uid,
-    required super.email,
-    super.displayName,
-    super.firstName,
-    super.lastName,
-    super.bio,
-    super.photoUrl,
-    super.coverImageUrl,
-    super.deviceTokens,
-  });
+  const AppUser(
+      {required super.uid,
+      required super.email,
+      super.displayName,
+      super.firstName,
+      super.lastName,
+      super.bio,
+      super.photoUrl,
+      super.coverImageUrl,
+      super.deviceTokens,
+      super.isBlockBy});
 
   String get id => uid;
 
@@ -36,28 +36,28 @@ class AppUser extends UserInfoDataModel {
 
   toUserInfoDataModel() {
     return UserInfoDataModel(
-      firstName: firstName,
-      lastName: lastName,
-      photoUrl: photoUrl,
-      displayName: displayName,
-      coverImageUrl: coverImageUrl,
-      bio: bio,
-      uid: uid,
-      email: email,
-    );
+        firstName: firstName,
+        lastName: lastName,
+        photoUrl: photoUrl,
+        displayName: displayName,
+        coverImageUrl: coverImageUrl,
+        bio: bio,
+        uid: uid,
+        email: email,
+        isBlockBy: isBlockBy);
   }
 
   factory AppUser.fromUserInfoDataModel(UserInfoDataModel userInfo) {
     return AppUser(
-      uid: userInfo.uid,
-      email: userInfo.email,
-      displayName: userInfo.displayName,
-      firstName: userInfo.firstName,
-      lastName: userInfo.lastName,
-      photoUrl: userInfo.photoUrl,
-      coverImageUrl: userInfo.coverImageUrl,
-      bio: userInfo.bio,
-    );
+        uid: userInfo.uid,
+        email: userInfo.email,
+        displayName: userInfo.displayName,
+        firstName: userInfo.firstName,
+        lastName: userInfo.lastName,
+        photoUrl: userInfo.photoUrl,
+        coverImageUrl: userInfo.coverImageUrl,
+        bio: userInfo.bio,
+        isBlockBy: userInfo.isBlockBy);
   }
 
   factory AppUser.fromCurrentUserDataModel(CurrentUserDataModel userInfo) {

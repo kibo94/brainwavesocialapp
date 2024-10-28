@@ -182,7 +182,7 @@ class _CreateGroupPageState extends ConsumerState<CreateGroupPage> {
                   child: HighlightButton(
                     text: "Create group",
                     onPressed: () async {
-                      var chatId;
+                      String chatId;
                       var prts = [
                         GroupUser(
                             imgUrl: currentUser!.avatar,
@@ -199,28 +199,36 @@ class _CreateGroupPageState extends ConsumerState<CreateGroupPage> {
                               email: currentUser.email!,
                             ));
                       });
-                      if (foundChat == null) {
-                        var id = await ref.read(
-                            createChatProvider(usersForCreatingAGroup).future);
-                        chatId = id;
+                      if (foundChat != null) {
+                        chatId = foundChat.chatId;
+                      } else {
+                        if (usersForCreatingAGroup.length <= 2) {
+                          chatId = "null";
+                        } else {
+                          var id = await ref.read(
+                              createChatProvider(usersForCreatingAGroup)
+                                  .future);
+                          chatId = id;
+                        }
                       }
 
-                      setState(() {
-                        usersForCreatingAGroup = [];
-                      });
                       AppRouter.go(
                         context,
                         RouterNames.messagePage,
                         pathParameters: {
                           "toUserId": foundChat == null
-                              ? 'Grupa'
+                              ? usersForCreatingAGroup.length > 2
+                                  ? 'Grupa'
+                                  : usersForCreatingAGroup[1].email
                               : foundChat.participants[1],
                           "isGroupChat":
-                              (foundChat?.type == "group").toString(),
-                          "groupId":
-                              foundChat != null ? foundChat.chatId : chatId
+                              (usersForCreatingAGroup.length > 2).toString(),
+                          "groupId": chatId
                         },
                       );
+                      setState(() {
+                        usersForCreatingAGroup = [];
+                      });
                     },
                   ),
                 ),

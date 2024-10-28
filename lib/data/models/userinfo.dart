@@ -4,17 +4,17 @@ part 'userinfo.g.dart';
 
 @JsonSerializable()
 class UserInfoDataModel {
-  const UserInfoDataModel({
-    required this.uid,
-    required this.email,
-    this.displayName = "",
-    this.firstName = "",
-    this.lastName = "",
-    this.photoUrl = "",
-    this.coverImageUrl = "",
-    this.bio = "",
-    this.deviceTokens,
-  });
+  const UserInfoDataModel(
+      {required this.uid,
+      required this.email,
+      this.displayName = "",
+      this.firstName = "",
+      this.lastName = "",
+      this.photoUrl = "",
+      this.coverImageUrl = "",
+      this.bio = "",
+      this.deviceTokens,
+      this.isBlockBy});
 
   final String uid;
   final String? displayName;
@@ -25,6 +25,7 @@ class UserInfoDataModel {
   final String? coverImageUrl;
   final String? bio;
   final List<String>? deviceTokens;
+  final List<String>? isBlockBy;
 
   factory UserInfoDataModel.fromJson(Map<String, dynamic> json) =>
       _$UserInfoDataModelFromJson(json);
