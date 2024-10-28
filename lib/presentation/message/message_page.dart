@@ -3,6 +3,7 @@ import 'package:brainwavesocialapp/domain/domain.dart';
 import 'package:brainwavesocialapp/presentation/message/message_state.dart';
 import 'package:brainwavesocialapp/presentation/profile/state/profile_state.dart';
 import 'package:brainwavesocialapp/presentation/search/search_state.dart';
+import 'package:brainwavesocialapp/presentation/utils/user_util.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -124,38 +125,45 @@ class MessagePage extends ConsumerWidget {
             ),
           ),
           // Input field and send button at the bottom
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Row(
-              children: [
-                Expanded(
-                  child: TextField(
-                    controller: _controller,
-                    decoration: InputDecoration(
-                      hintText: "Type your message",
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(20.0),
+          if (!UserUtil.isUserBlocked(
+              currentUser!,
+              searchUsers.value!
+                  .where((sUser) => sUser.email == toUserId)
+                  .toList()
+                  .first))
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: TextField(
+                      controller: _controller,
+                      decoration: InputDecoration(
+                        hintText: "Type your message",
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(20.0),
+                        ),
                       ),
                     ),
                   ),
-                ),
-                IconButton(
-                  icon: const Icon(Icons.send),
-                  onPressed: () {
-                    String message = _controller.text.trim();
-                    if (message.isNotEmpty) {
-                      ref.read(sendMessageStateProvider(
-                          [message, toUserId, groupId]));
-                      scrollToBottom();
-                      // Close the keyboard
-                      FocusScope.of(context).unfocus(); // Dismiss the keyboard
-                      _controller.clear();
-                    }
-                  },
-                ),
-              ],
+                  IconButton(
+                    icon: const Icon(Icons.send),
+                    onPressed: () {
+                      String message = _controller.text.trim();
+                      if (message.isNotEmpty) {
+                        ref.read(sendMessageStateProvider(
+                            [message, toUserId, groupId]));
+                        scrollToBottom();
+                        // Close the keyboard
+                        FocusScope.of(context)
+                            .unfocus(); // Dismiss the keyboard
+                        _controller.clear();
+                      }
+                    },
+                  ),
+                ],
+              ),
             ),
-          ),
         ],
       ),
     );

@@ -185,10 +185,12 @@ class _UserRemoteDataSource implements UserRepository {
   }
 
   @override
-  Future<void> blockTheUser(AppUser user, String userToBlock) {
+  Future<void> blockUnblockUser(AppUser user, String userToBlock) {
     List<String> isBlockBy = [...user.isBlockBy!];
     if (!isBlockBy.contains(userToBlock)) {
       isBlockBy.add(userToBlock);
+    } else {
+      isBlockBy.remove(userToBlock);
     }
 
     return databaseDataSource

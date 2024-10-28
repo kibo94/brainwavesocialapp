@@ -9,7 +9,7 @@ abstract interface class UserUseCase {
   Future<List<Post>> getUserPosts(String uid);
   Stream<AppUser> getCurrentUserInfo();
   Future<void> signOut();
-  Future<void> blockTheUser(AppUser user, String userToBlock);
+  Future<void> blockUnblockUser(AppUser user, String userToBlock);
   Future<void> updatePost(PostDataModel post);
   Stream<bool> isUserLikedPost(String postId);
 }
@@ -54,8 +54,8 @@ class _UserUseCase implements UserUseCase {
   }
 
   @override
-  Future<void> blockTheUser(AppUser user, String userToBlock) {
-    return _userRepository.blockTheUser(user, userToBlock);
+  Future<void> blockUnblockUser(AppUser user, String userToBlock) {
+    return _userRepository.blockUnblockUser(user, userToBlock);
   }
 
   @override

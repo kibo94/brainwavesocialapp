@@ -58,8 +58,6 @@ class _CreateGroupPageState extends ConsumerState<CreateGroupPage> {
           },
         );
       } catch (e) {
-        // Handle any errors that occur
-        print('Error: $e');
         return null; // Return null or handle the error as needed
       }
     }

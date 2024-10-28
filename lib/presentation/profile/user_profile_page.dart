@@ -163,26 +163,25 @@ class UserProfilePage extends ConsumerWidget {
 
   Widget _buildPopupMenu(
       BuildContext context, AppUser user, WidgetRef ref, AppUser userToBlock) {
-    var isUserBlocked = UserUtil.isUserBlocked(userToBlock, user);
+    var isUserBlocked = UserUtil.isUserBlocked(
+      user,
+      userToBlock,
+    );
     return PopupMenuButton<String>(
       icon: const Icon(Icons.more_vert),
       padding: const EdgeInsets.all(4),
       onSelected: (value) {
-        // Handle actions based on the selected value
         switch (value) {
           case 'block':
             ref.read(blockUserProvider(
               Tuple2(user, userToBlock.email!),
             ));
-            // Edit chat
             break;
 
           case 'unblock':
-            print('unblock user');
-            // ref.read(unBlockUserProvider(
-            //   Tuple2(user, userToBlock.email!),
-            // ));
-            // Edit chat
+            ref.read(blockUserProvider(
+              Tuple2(user, userToBlock.email!),
+            ));
             break;
         }
       },
@@ -199,26 +198,16 @@ class UserProfilePage extends ConsumerWidget {
           //   ),
           // ),
           PopupMenuItem<String>(
-            value: isUserBlocked ? 'block' : "unblock",
+            value: !isUserBlocked ? 'block' : "unblock",
             padding: const EdgeInsets.all(4),
             child: Row(
               children: [
                 const Icon(Icons.block),
                 const SizedBox(width: 8),
-                Text('${isUserBlocked ? "Block" : "Unblock"} user'),
+                Text('${!isUserBlocked ? "Block" : "Unblock"} user'),
               ],
             ),
           ),
-          // PopupMenuItem<String>(
-          //   value: 'details',
-          //   child: Row(
-          //     children: [
-          //       Icon(Icons.info),
-          //       SizedBox(width: 8),
-          //       Text('View Details'),
-          //     ],
-          //   ),
-          // ),
         ];
       },
     );

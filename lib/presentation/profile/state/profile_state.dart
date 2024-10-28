@@ -25,7 +25,9 @@ final blockUserProvider =
     final user = data.item1; // First string parameter
     final blockedUserEmail = data.item2; // Second string parameter
 
-    return ref.watch(userUseCaseProvider).blockTheUser(user, blockedUserEmail);
+    return ref
+        .watch(userUseCaseProvider)
+        .blockUnblockUser(user, blockedUserEmail);
   },
 );
 

@@ -13,7 +13,7 @@ abstract interface class UserRepository {
   Future<void> followUser(String currentUserId, String idUserToFollow);
   Future<void> unFollowUser(String currentUserId, String idUserToUnfollow);
   Stream<bool> userLikedAPost(String postId, String userId);
-  Future<void> blockTheUser(AppUser user, String userToBlock);
+  Future<void> blockUnblockUser(AppUser user, String userToBlock);
   Future<List<UserInfoDataModel>> searchUsers();
   Future<void> editUserProfile({
     required String uid,

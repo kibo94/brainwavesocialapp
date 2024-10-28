@@ -26,8 +26,8 @@ class _UserRepository implements UserRepository {
   }
 
   @override
-  Future<void> blockTheUser(AppUser user, String userToBlock) {
-    return databaseDataSource.blockTheUser(user, userToBlock);
+  Future<void> blockUnblockUser(AppUser user, String userToBlock) {
+    return databaseDataSource.blockUnblockUser(user, userToBlock);
   }
 
   @override
